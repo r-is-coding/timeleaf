@@ -1,6 +1,6 @@
 # Principles
 
-**Status:** Draft for review (proposed in [proposals/0001](proposals/0001-feedback-round-1.md)) · **Owner:** the reader
+**Status:** Accepted 2026-11-27 (see [proposals/DECISIONS.md](proposals/DECISIONS.md)) · **Owner:** the owner of Timeleaf
 
 The one place that says what The Loop is for. Plans, prompts, validators and reviews refer back here. When a change conflicts with this page, either the change or this page is wrong: decide which, and record it in the change log at the bottom.
 
@@ -23,15 +23,15 @@ It started with one reader. They work in AI safety advocacy and have left social
 7. **Friends always appear, and silence is not news.** Everything a friend publishes is included. Weeks when they publish nothing are not mentioned.
 8. **Honest about blind spots.** Each edition says what it checked, what failed, and what it cannot see.
 9. **Calm.** No likes, counts, streaks, notifications or infinite scroll. Feedback is given in words.
-10. **A person approves what goes public.** An AI drafts the paper. Nothing goes public without a person approving it. A private paper goes straight to its one reader after the automatic checks; the reader's feedback is the correction loop. *(Proposed in 0002; before that: every edition approved by the reader.)*
+10. **A person approves what goes public.** An AI drafts the paper. Nothing goes public without a person approving it. A private paper goes straight to its one reader after the automatic checks; the reader's feedback is the correction loop.
 11. **Respect writers.** Credit and link the original. Never republish others' work publicly. Paywalls are respected.
-12. **Private by default.** A reader's interests, sources and paper are theirs. No one else sees them, the owner of Timeleaf included, unless the reader shares. *(Proposed in 0002.)*
+12. **Private by default.** A reader's interests, sources and paper are seen only by that reader and by the owner of Timeleaf, who runs the service. Readers are told this before they sign up. No one else sees them unless the reader shares.
 
 ### Design values
 
 13. **Usable first.** Easy to read on a phone at 7 a.m. and on a laptop at night: large text, short lines, obvious navigation, fast, works without JavaScript, accessible. When striking and usable conflict, usable wins.
 14. **Simple.** Few elements, and each one earns its place. No chrome, no badges, nothing that moves unless the reader moves it.
-15. **Striking and its own.** Recognisable from a single screenshot. It borrows the newspaper's *rituals*: masthead, dateline, sections, a lead story, an end. It does not imitate the newspaper's *material*: paper textures, cramped columns on a phone, tiny print. *(Proposed in 0003.)*
+15. **Striking and its own.** Recognisable from a single screenshot. It borrows the newspaper's *rituals*: masthead, dateline, sections, a lead story, an end. It does not imitate the newspaper's *material*: paper textures, cramped columns on a phone, tiny print.
 
 ## User stories
 

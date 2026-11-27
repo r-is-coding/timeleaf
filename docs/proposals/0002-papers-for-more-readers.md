@@ -1,6 +1,6 @@
 # Proposal 0002 — A paper for every reader (starting with one friend)
 
-**Status:** Proposed, for review · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the owner
+**Status:** Accepted with changes, see [DECISIONS.md](DECISIONS.md) · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the owner
 **Builds on:** [0001](0001-feedback-round-1.md) (P1 decided as option B: private papers; Cloudflare approved)
 
 ## The request

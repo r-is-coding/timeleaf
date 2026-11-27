@@ -1,6 +1,6 @@
 # Proposal 0001 — Reader feedback, round 1
 
-**Status:** Proposed, for review · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the reader
+**Status:** Accepted with changes, see [DECISIONS.md](DECISIONS.md) · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the reader
 **Process:** reviewer comments or edits this file → reader decides the open questions → implementation on a branch, PR per proposal part.
 
 ## Decisions (reader, 2026-11-27)

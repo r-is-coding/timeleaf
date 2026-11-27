@@ -1,6 +1,6 @@
 # Proposal 0003 — Design direction
 
-**Status:** Proposed, for review · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the owner
+**Status:** Accepted with changes, see [DECISIONS.md](DECISIONS.md) · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the owner
 **Serves:** design values 13–15 and US-11, US-12 in [PRINCIPLES.md](../PRINCIPLES.md)
 
 ## The request
