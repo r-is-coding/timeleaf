@@ -370,7 +370,8 @@ Hard limits: per-run cap in code (US$3) and a monthly spend limit set on the Ant
 Estimates are for one developer. Each milestone ends in something deployed.
 
 ### M0 — Foundations (1–2 days)
-- [ ] Decide Q1–Q3 (naming, repo visibility, indexing).
+- [ ] Decide Q1 and Q3 (naming, indexing). Q2 decided: public repo.
+- [x] Pages enabled (source: GitHub Actions), custom domain `timeleaf.ee` set in Pages settings; environment `edition` created.
 - [x] `pyproject.toml`, uv, ruff, mypy, pytest, pre-commit, `.gitignore`, `README.md`.
 - [x] `ci.yml` and `deploy.yml`; CODEOWNERS; Dependabot.
 - [ ] Branch protection on `main` (after the first merge).
@@ -448,7 +449,7 @@ Blocking items are marked ⛔ with the milestone they block.
 | # | Question | Default if no answer |
 |---|---|---|
 | Q1 | Naming: is **Timeleaf** the site and **The Loop** the weekly paper inside it? | Yes: masthead says "The Loop", site title "The Loop · Timeleaf" |
-| Q2 ⛔ M0 | Repo public (free Pages) or private with GitHub Pro ($4/mo)? | Make public before deploy; candidates never committed |
+| Q2 ✅ | Repo public (free Pages) or private with GitHub Pro ($4/mo)? | **Decided 2026-11-27: public.** Candidates are never committed |
 | Q3 ⛔ M0 | Should search engines index the site? | Indexable |
 | Q4 ⛔ go-live | Have Gamithra, Llela and Sese agreed to appear by name? | Do not go live with names until they have |
 | Q5 ⛔ M0 | Which registrar holds timeleaf.ee, and who can edit DNS? | — |
