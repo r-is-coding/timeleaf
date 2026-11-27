@@ -109,7 +109,7 @@ def edit(
         typer.echo(f"Editor failed: {e}", err=True)
         raise typer.Exit(1) from e
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(edition.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    target.write_text(edition.model_dump_json(indent=1) + "\n", encoding="utf-8", newline="\n")
     typer.echo(
         f"Wrote {target}: {edition.item_count} items, {stats.calls} call(s), ${stats.cost_usd:.2f}, "
         f"{len(stats.findings)} warning(s)"
@@ -265,7 +265,9 @@ def schema(out: Annotated[Path, Opt("-o", "--out")] = Path("docs/schemas")) -> N
     }
     for name, model in models.items():
         (out / f"{name}.schema.json").write_text(
-            json.dumps(model.model_json_schema(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            json.dumps(model.model_json_schema(), indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
         )
     typer.echo(f"Wrote schemas to {out}")
 
