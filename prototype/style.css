@@ -1,0 +1,27 @@
+/* layout: one reading column; section names sit in a left rail on wide screens, above on phones */
+:root{--bg:#f3f5f1;--surface:#e7ebe4;--fg:#18211c;--muted:#5b675f;--rule:#c9d1c8;--accent:#0b6b4f;--mark:#d7ead9;
+--display:"Bricolage Grotesque",system-ui,sans-serif;--text:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--text);font-size:18px;line-height:1.55}
+.wrap{max-width:880px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+a:hover{color:var(--accent)}a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mast{padding-bottom:28px;border-bottom:3px solid var(--fg)}
+.issue,.kicker,.meta,.why,.sec p,footer{font-family:var(--mono);font-size:13px;line-height:1.5}
+.issue{color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(52px,12vw,104px);line-height:.9;letter-spacing:-.04em;margin:0}
+.lede{font-size:21px;line-height:1.45;max-width:34em;margin:20px 0 0}
+section{display:grid;grid-template-columns:170px minmax(0,1fr);gap:0 32px;padding-top:28px;border-bottom:1px solid var(--rule)}
+.sec{grid-row:1 / span 20}.sec h2{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.sec p{color:var(--muted);margin:0}
+.item{grid-column:2;min-width:0;padding-bottom:26px;max-width:36em}
+.kicker{color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin:0 0 4px;font-weight:500}
+h3{font-family:var(--display);font-weight:500;font-size:23px;line-height:1.2;margin:0;text-wrap:balance}
+.lead h3{font-size:clamp(28px,5vw,38px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+.meta{color:var(--muted);margin:6px 0 0}.body{margin:8px 0 0}
+.more{margin:8px 0 0;padding-left:1.1em;font-size:16px}
+.why{margin:10px 0 0;color:var(--muted)}.why span{background:var(--mark);color:var(--fg);padding:1px 6px;margin-right:4px}
+footer{color:var(--muted);padding-top:28px;max-width:60em}footer p{margin:0 0 10px}footer strong{color:var(--fg);font-weight:500}
+.end{font-family:var(--display);font-size:22px;color:var(--fg);margin-bottom:18px}
+@media (max-width:640px){body{font-size:17px}section{grid-template-columns:minmax(0,1fr)}.sec{grid-row:auto;margin-bottom:18px}.item{grid-column:1}}

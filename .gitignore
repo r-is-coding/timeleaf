@@ -1,0 +1,19 @@
+# build output
+_site/
+prototype/site/
+# fetched candidates contain third-party post bodies: never commit
+candidates*.json
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+# local
+.env
+.env.*
+.DS_Store
+Thumbs.db
