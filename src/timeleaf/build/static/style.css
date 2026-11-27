@@ -1,0 +1,76 @@
+/* The Loop. One reading column; section names sit in a left rail on wide screens and above items on phones.
+   Fonts are self-hosted (SIL OFL 1.1). Only the latin subset loads unless a page needs latin-ext. */
+
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-ext-400.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/source-serif-4-latin-600.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/source-serif-4-latin-ext-600.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/bricolage-grotesque-latin-500.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/bricolage-grotesque-latin-ext-500.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/bricolage-grotesque-latin-700.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/bricolage-grotesque-latin-ext-700.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-ext-400.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-500.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-ext-500.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{--bg:#f3f5f1;--surface:#e7ebe4;--fg:#18211c;--muted:#5b675f;--rule:#c9d1c8;--accent:#0b6b4f;--mark:#d7ead9;
+--display:"Bricolage Grotesque",system-ui,sans-serif;--text:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--text);font-size:18px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:880px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--fg);color:var(--bg);padding:8px 12px;z-index:10}
+.skip:focus{left:16px}
+
+.topnav{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:28px}
+.topnav .brand{font-weight:500;color:var(--fg);text-decoration:none;letter-spacing:.04em;text-transform:uppercase}
+
+.mast{padding-bottom:28px;border-bottom:3px solid var(--fg)}
+.issue,.kicker,.meta,.why,.sec p,.colophon{font-family:var(--mono);font-size:13px;line-height:1.5}
+.issue{color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(52px,12vw,104px);line-height:.9;letter-spacing:-.04em;margin:0}
+.lede{font-size:21px;line-height:1.45;max-width:34em;margin:20px 0 0}
+
+section{display:grid;grid-template-columns:170px minmax(0,1fr);gap:0 32px;padding-top:28px;border-bottom:1px solid var(--rule)}
+.sec{grid-row:1 / span 20}
+.sec h2{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.sec p{color:var(--muted);margin:0}
+.item{grid-column:2;min-width:0;padding-bottom:26px;max-width:36em}
+.kicker{color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin:0 0 4px;font-weight:500}
+h3{font-family:var(--display);font-weight:500;font-size:23px;line-height:1.2;margin:0;text-wrap:balance}
+.lead h3{font-size:clamp(28px,5vw,38px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+.note h3{font-size:19px;color:var(--muted)}
+.meta{color:var(--muted);margin:6px 0 0}
+.body{margin:8px 0 0}
+.more{margin:8px 0 0;padding-left:1.1em;font-size:16px}
+.why{margin:10px 0 0;color:var(--muted)}
+.why span{background:var(--mark);color:var(--fg);padding:1px 6px;margin-right:4px}
+
+.colophon{color:var(--muted);padding-top:28px;max-width:60em}
+.colophon p{margin:0 0 10px}
+.colophon strong{color:var(--fg);font-weight:500}
+.end{font-family:var(--display);font-size:22px;color:var(--fg);margin-bottom:18px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:16px;border-top:1px solid var(--rule)}
+
+.archive{list-style:none;margin:0;padding:0}
+.archive li{border-bottom:1px solid var(--rule)}
+.archive a{display:block;padding:18px 0;text-decoration:none}
+.archive .t{display:block;max-width:40em}
+.archive a:hover .t{text-decoration:underline;text-decoration-color:var(--accent)}
+
+.prose{max-width:36em;padding-top:12px}
+.prose h2{font-family:var(--display);font-weight:700;font-size:24px;margin:32px 0 8px}
+.prose li{margin-bottom:6px}
+.feedback{display:grid;gap:8px;max-width:32em}
+.feedback label{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.feedback textarea,.feedback input{font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--rule);padding:10px;width:100%}
+.feedback button{justify-self:start;font:500 14px var(--mono);background:var(--fg);color:var(--bg);border:0;padding:10px 16px;cursor:pointer}
+
+@media (max-width:640px){body{font-size:17px}section{grid-template-columns:minmax(0,1fr)}.sec{grid-row:auto;margin-bottom:18px}.item{grid-column:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

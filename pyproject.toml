@@ -1,0 +1,57 @@
+[project]
+name = "timeleaf"
+version = "0.1.0"
+description = "The Loop: a finite weekly newspaper, built and published at timeleaf.ee"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=1.0",
+    "httpx>=0.27",
+    "jinja2>=3.1",
+    "pydantic>=2.9",
+    "typer>=0.12",
+]
+
+[project.scripts]
+timeleaf = "timeleaf.cli:app"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/timeleaf"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["prototype"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = [
+    "S101",    # assert is fine in tests and for invariants
+    "RUF001",  # en dashes in date ranges are intentional typography
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "RUF012"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+files = ["src"]
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=timeleaf --cov-report=term-missing:skip-covered"
