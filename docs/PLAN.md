@@ -1,6 +1,6 @@
 # Timeleaf — Implementation Plan
 
-**Status:** Approved for build · **Version:** 1.0 · **Date:** 2026-11-27 · **Owner:** @r-is-coding
+**Status:** M0–M3 code complete; infrastructure steps pending (see checklists) · **Version:** 1.1 · **Date:** 2026-11-27 · **Owner:** @r-is-coding
 **Production URL:** https://timeleaf.ee · **Repo:** `r-is-coding/timeleaf`
 
 This is the plan of record for turning the working prototype of *The Loop* (a weekly personal newspaper) into a production website at timeleaf.ee. It is written so a developer who has not seen any earlier conversation can start on Milestone 0 today.
@@ -220,37 +220,41 @@ class Link(BaseModel):
     label: str
     url: HttpUrl
 
+
 class Item(BaseModel):
-    kind: Literal["news", "essay", "friend", "edge", "buzz"]
-    kicker: str                  # e.g. "US politics"
+    kind: Literal["news", "essay", "friend", "edge", "buzz", "note"]  # note: a line with no link
+    kicker: str  # e.g. "US politics"
     title: str
     url: HttpUrl
-    source: str                  # author / publication
-    mins: int | None = None      # reading time; required for essays
+    source: str  # author / publication
+    mins: int | None = None  # reading time; required for essays
     body: str
-    why: str                     # "Why it is here"
+    why: str  # "Why it is here"
     more: list[Link] = []
-    seen: str | None = None      # Buzz only: "direct" | "via <source>"
+    seen: str | None = None  # Buzz only: "direct" | "via <source>"
+
 
 class Section(BaseModel):
-    id: str                      # slug: front-page, policy-desk, movement, worth-your-time, friends, edges, buzz
+    id: str  # slug: front-page, policy-desk, movement, worth-your-time, friends, edges, buzz
     title: str
     note: str
     items: list[Item]
 
+
 class Colophon(BaseModel):
-    checked: str                 # generated from health ledger
-    blind: str                   # what this edition cannot see
+    checked: str  # generated from health ledger
+    blind: str  # what this edition cannot see
     requests_ok: int
     requests_failed: list[str]
     model: str | None = None
     cost_usd: float | None = None
 
+
 class Edition(BaseModel):
     schema_version: Literal[1] = 1
     number: int
-    date: date                   # publication date (Friday)
-    range: str                   # "20–27 November 2026"
+    date: date  # publication date (Friday)
+    range: str  # "20–27 November 2026"
     lede: str
     sections: list[Section]
     colophon: Colophon
@@ -367,35 +371,36 @@ Estimates are for one developer. Each milestone ends in something deployed.
 
 ### M0 — Foundations (1–2 days)
 - [ ] Decide Q1–Q3 (naming, repo visibility, indexing).
-- [ ] `pyproject.toml`, uv, ruff, mypy, pytest, pre-commit, `.gitignore`, `README.md`.
-- [ ] `ci.yml` and `deploy.yml`; branch protection; CODEOWNERS; Dependabot.
+- [x] `pyproject.toml`, uv, ruff, mypy, pytest, pre-commit, `.gitignore`, `README.md`.
+- [x] `ci.yml` and `deploy.yml`; CODEOWNERS; Dependabot.
+- [ ] Branch protection on `main` (after the first merge).
 - [ ] Domain verified, DNS set, HTTPS enforced. A placeholder page is live at https://timeleaf.ee.
 
 **Done when:** a PR runs CI green and merging it deploys to timeleaf.ee over HTTPS.
 
 ### M1 — Port the prototype (3–4 days)
-- [ ] `models.py` + generated JSON schemas; migrate edition 1 to schema v1.
-- [ ] `fetch/` package ported from `prototype/fetch.py` with fixtures and tests; health ledger.
-- [ ] `build/` with Jinja templates; style ported; fonts self-hosted; §2.5 fixes.
-- [ ] `validate.py` with all v1 rules and tests.
-- [ ] Golden test for edition 1.
+- [x] `models.py` + generated JSON schemas; migrate edition 1 to schema v1.
+- [x] `fetch/` package ported from `prototype/fetch.py` with fixtures and tests; health ledger.
+- [x] `build/` with Jinja templates; style ported; fonts self-hosted; §2.5 fixes.
+- [x] `validate.py` with all v1 rules and tests.
+- [x] Golden test for edition 1.
 
 **Done when:** `timeleaf fetch` produces candidates equivalent to the prototype's, edition 1 is live at `/editions/2026-11-27/`, and it looks the same as the prototype in both colour schemes.
 
 ### M2 — Site completeness (2–3 days)
-- [ ] Archive, About, 404, Atom feed, sitemap, robots, favicon, Open Graph.
-- [ ] CSP; HTML validation and internal link check in CI.
+- [x] Archive, About, 404, Atom feed, sitemap, robots, favicon, Open Graph.
+- [x] CSP; HTML validation and internal link check in CI.
 - [ ] Lighthouse and accessibility pass; fix findings.
-- [ ] Feedback in words: a short form on About (Formspree, already used on rcrd.nl) or a `mailto:` (Q8).
+- [x] Feedback form on About, switched on by setting `feedback_form_action` in `config/site.json` (Q8: needs a Formspree form ID).
 
 **Done when:** quality bars in §5 are met and checked in CI where automatable.
 
 ### M3 — Automated weekly edition (3–5 days)
-- [ ] `edit/prompt.md` written from the product rules and edition 1 as the worked example.
-- [ ] `edit/editor.py`: structured outputs, streaming, refusal fallback, repair loop, cost cap, usage logging.
-- [ ] `weekly-edition.yml` with bot token, PR body summary, failure issues.
-- [ ] `canary.yml`.
-- [ ] `docs/runbook.md`: rerun, edit, skip a week, rotate key, re-enable cron, publish manually from a laptop if Actions is blocked.
+- [x] `edit/prompt.md` written from the product rules. *(Instead of a fixed worked example, last week's edition is sent with each request, which also stops repeats.)*
+- [x] `edit/editor.py`: structured outputs, streaming, refusal fallback, repair loop, cost cap, usage logging.
+- [x] `weekly-edition.yml` with bot token, PR body summary, failure issues.
+- [x] `canary.yml`.
+- [x] `docs/runbook.md`: rerun, edit, skip a week, rotate key, re-enable cron, publish manually from a laptop if Actions is blocked.
 - [ ] One **shadow week**: the workflow runs and opens a PR; the owner compares it to a hand-made edition before trusting it.
 
 **Done when:** two consecutive Friday PRs are opened unattended, pass validation, and are merged with ≤ 10 minutes of editing each.

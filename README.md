@@ -2,22 +2,45 @@
 
 Source for **[timeleaf.ee](https://timeleaf.ee)**, home of *The Loop*: a finite weekly newspaper on AI safety, AI policy and the writing around them, built from what trusted people pointed at, not from a feed.
 
-Each week a workflow fetches candidates (Substack, LessWrong), Claude drafts the edition, validators check it, and it arrives as a pull request. Merging the PR publishes it.
+Each Friday a workflow fetches candidates (Substack, LessWrong), Claude drafts the edition, validators check it, and it arrives as a pull request. **Merging the PR publishes it.**
 
-## Start here
+```
+config/sources.json ─► timeleaf fetch ─► candidates.json ─► timeleaf edit (Claude) ─► content/editions/DATE.json ─► timeleaf build ─► timeleaf.ee
+```
 
-- **[docs/PLAN.md](docs/PLAN.md)** — the implementation plan: architecture, milestones, standards, open questions.
-- [docs/adr/](docs/adr/) — architecture decisions.
-- [docs/PLAN-buzz.md](docs/PLAN-buzz.md) — plan for "The Buzz" section.
-- [prototype/](prototype/) — the original working scripts (frozen reference).
-- [content/editions/](content/editions/) — published editions (source of truth).
-
-## Status
-
-Planning complete. Development starts at **Milestone 0** in the plan. Until M1 lands, the prototype can be run with:
+## Quick start
 
 ```bash
-cd prototype
-python fetch.py candidates.json 7
-python build.py ../content/editions/2026-11-27.json
+uv sync
+uv run pytest
+uv run timeleaf build && uv run timeleaf serve     # http://127.0.0.1:8000
 ```
+
+| Command | Does |
+|---|---|
+| `timeleaf fetch -o candidates.json` | Collect the week's candidates (network) |
+| `timeleaf edit candidates.json` | Draft, validate and write an edition with Claude (`--dry-run` estimates the cost) |
+| `timeleaf validate [FILES] [--candidates C]` | Schema + editorial rules (+ URL provenance with candidates) |
+| `timeleaf build` / `serve` | Render `_site/` / serve it locally |
+| `timeleaf canary` | Check the source endpoints still work |
+| `timeleaf schema` | Regenerate `docs/schemas/` |
+
+## Layout
+
+```
+config/            sources.json (who to read), site.json (domain, indexing, feedback form)
+content/editions/  one JSON file per published edition: the source of truth
+src/timeleaf/      fetch/ · edit/ (prompt.md + Claude call) · validate.py · build/ (Jinja templates, CSS, fonts)
+tests/             no network; fixtures + golden snapshot of edition 1
+docs/              PLAN.md · runbook.md · adr/ · schemas/ · PLAN-buzz.md
+prototype/         the original scripts, frozen for reference
+```
+
+## Docs
+
+- **[docs/PLAN.md](docs/PLAN.md)**: architecture, milestones, standards, open questions.
+- **[docs/runbook.md](docs/runbook.md)**: the weekly cycle, failures, secrets, changing things.
+- [docs/adr/](docs/adr/): architecture decisions.
+- [docs/PLAN-buzz.md](docs/PLAN-buzz.md): "The Buzz" section (Milestone 4).
+
+Fonts: Source Serif 4, Bricolage Grotesque and IBM Plex Mono, self-hosted under the SIL Open Font License 1.1.
