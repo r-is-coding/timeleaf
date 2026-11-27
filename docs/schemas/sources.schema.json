@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "Friend": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "handle": {
+          "title": "Handle",
+          "type": "string"
+        },
+        "recommendations": {
+          "default": false,
+          "title": "Recommendations",
+          "type": "boolean"
+        },
+        "rec_days": {
+          "default": 7,
+          "title": "Rec Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "handle"
+      ],
+      "title": "Friend",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "me": {
+      "description": "The reader's Substack handle; their subscriptions are the seeds.",
+      "title": "Me",
+      "type": "string"
+    },
+    "friends": {
+      "items": {
+        "$ref": "#/$defs/Friend"
+      },
+      "title": "Friends",
+      "type": "array"
+    },
+    "roundups": {
+      "description": "Publication names whose links count as votes",
+      "items": {
+        "type": "string"
+      },
+      "title": "Roundups",
+      "type": "array"
+    },
+    "extra_seed_handles": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Extra Seed Handles",
+      "type": "array"
+    },
+    "signal_handles": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Signal Handles",
+      "type": "array"
+    }
+  },
+  "required": [
+    "me",
+    "friends"
+  ],
+  "title": "Sources",
+  "type": "object"
+}

@@ -1,0 +1,52 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ site.publication }} No. {{ e.number }} · {{ e.range }}{% endblock %}
+{% block description %}{{ e.lede }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block main %}
+<header class="mast">
+  <p class="issue">No. {{ e.number }} · {{ e.range }}</p>
+  <h1>{{ site.publication }}</h1>
+  <p class="lede">{{ e.lede }}</p>
+</header>
+{% for s in e.sections %}
+{% set outer = loop %}
+<section aria-labelledby="s-{{ s.id }}">
+  <header class="sec"><h2 id="s-{{ s.id }}">{{ s.title }}</h2><p>{{ s.note }}</p></header>
+  {% for i in s.items %}
+  <article class="item{% if outer.first and loop.first %} lead{% endif %}{% if i.kind == 'note' %} note{% endif %}">
+    {% if i.kicker %}
+    <p class="kicker">{{ i.kicker }}</p>
+    {% endif %}
+    <h3>{% if i.url %}<a href="{{ i.url }}">{{ i.title }}</a>{% else %}{{ i.title }}{% endif %}</h3>
+    {% if i.source or i.mins %}
+    <p class="meta">{{ i.source or "" }}{% if i.source and i.mins %} · {% endif %}{% if i.mins %}{{ i.mins }} min{% endif %}</p>
+    {% endif %}
+    <p class="body">{{ i.body }}</p>
+    {% if i.more %}
+    <ul class="more">
+      {% for m in i.more %}
+      <li><a href="{{ m.url }}">{{ m.label }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if i.why %}
+    <p class="why"><span>Why it is here</span> {{ i.why }}{% if i.seen %} · {% if i.seen == 'direct' %}read directly on X{% else %}seen {{ i.seen }}{% endif %}{% endif %}</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% endfor %}
+<footer class="colophon">
+  <p class="end">That is all for this week.</p>
+  <p><strong>What was checked.</strong> {{ e.colophon.checked }}</p>
+  <p><strong>What it cannot see.</strong> {{ e.colophon.blind }}</p>
+  {% if e.colophon.model %}
+  <p><strong>How it was made.</strong> Drafted by {{ e.colophon.model }}{% if e.colophon.cost_usd is not none %} for ${{ '%.2f' | format(e.colophon.cost_usd) }}{% endif %}, then read and approved by a person.</p>
+  {% endif %}
+  <nav class="pager" aria-label="Editions">
+    {% if prev %}<a href="{{ edition_path(prev) }}" rel="prev">← No. {{ prev.number }}</a>{% else %}<span></span>{% endif %}
+    <a href="/archive/">All editions</a>
+    {% if next %}<a href="{{ edition_path(next) }}" rel="next">No. {{ next.number }} →</a>{% else %}<span></span>{% endif %}
+  </nav>
+</footer>
+{% endblock %}

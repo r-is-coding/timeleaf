@@ -1,0 +1,187 @@
+{
+  "$defs": {
+    "DraftItem": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "news",
+            "essay",
+            "friend",
+            "edge",
+            "buzz",
+            "note"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "kicker": {
+          "title": "Kicker",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        },
+        "mins": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mins"
+        },
+        "body": {
+          "title": "Body",
+          "type": "string"
+        },
+        "why": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Why"
+        },
+        "more": {
+          "items": {
+            "$ref": "#/$defs/DraftLink"
+          },
+          "title": "More",
+          "type": "array"
+        },
+        "seen": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Seen"
+        }
+      },
+      "required": [
+        "kind",
+        "kicker",
+        "title",
+        "url",
+        "source",
+        "mins",
+        "body",
+        "why",
+        "more",
+        "seen"
+      ],
+      "title": "DraftItem",
+      "type": "object"
+    },
+    "DraftLink": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "url"
+      ],
+      "title": "DraftLink",
+      "type": "object"
+    },
+    "DraftSection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/DraftItem"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "note",
+        "items"
+      ],
+      "title": "DraftSection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What the model writes. Numbers, dates and run facts are filled in by code.",
+  "properties": {
+    "lede": {
+      "title": "Lede",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/DraftSection"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "blind": {
+      "description": "One short paragraph: what this edition cannot see.",
+      "title": "Blind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "lede",
+    "sections",
+    "blind"
+  ],
+  "title": "Draft",
+  "type": "object"
+}

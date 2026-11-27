@@ -1,0 +1,410 @@
+{
+ "/api/v1/user/reader/public_profile": {
+  "id": 1,
+  "name": "Reader",
+  "subscriptions": [
+   {
+    "publication": {
+     "author_id": 100,
+     "name": "Roundup Weekly"
+    }
+   },
+   {
+    "publication": {
+     "author_id": 200,
+     "name": "Essays Monthly"
+    }
+   },
+   {
+    "publication": {
+     "name": "No author id"
+    }
+   }
+  ]
+ },
+ "/api/v1/user/ana/public_profile": {
+  "id": 10,
+  "name": "Ana"
+ },
+ "/api/v1/user/ben/public_profile": {
+  "id": 11,
+  "name": "Ben"
+ },
+ "/api/v1/profile/posts?profile_user_id=10&limit=6": {
+  "posts": [
+   {
+    "id": 1001,
+    "title": "Ana's new post",
+    "subtitle": null,
+    "canonical_url": "https://ana.substack.com/p/new",
+    "post_date": "2026-11-25T10:00:00.000Z",
+    "wordcount": 1200,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 10010,
+      "name": "Author 1001"
+     }
+    ],
+    "truncated_body_text": "Teaser for Ana's new post"
+   },
+   {
+    "id": 1002,
+    "title": "Ana's old post",
+    "subtitle": null,
+    "canonical_url": "https://ana.substack.com/p/old",
+    "post_date": "2026-10-01T10:00:00.000Z",
+    "wordcount": 800,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 10020,
+      "name": "Author 1002"
+     }
+    ],
+    "truncated_body_text": "Teaser for Ana's old post"
+   }
+  ]
+ },
+ "/api/v1/posts/by-id/1001": {
+  "post": {
+   "id": 1001,
+   "title": "Ana's new post",
+   "subtitle": null,
+   "canonical_url": "https://ana.substack.com/p/new",
+   "post_date": "2026-11-25T10:00:00.000Z",
+   "wordcount": 1200,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 10010,
+     "name": "Author 1001"
+    }
+   ],
+   "truncated_body_text": "Teaser for Ana's new post",
+   "body_html": "<p>Hello <b>world</b> &amp; friends</p>"
+  }
+ },
+ "/api/v1/profile/posts?profile_user_id=11&limit=6": {
+  "posts": [
+   {
+    "id": 1101,
+    "title": "Ben's last post",
+    "subtitle": null,
+    "canonical_url": "https://ben.substack.com/p/last",
+    "post_date": "2026-09-01T10:00:00.000Z",
+    "wordcount": 900,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 11010,
+      "name": "Author 1101"
+     }
+    ],
+    "truncated_body_text": "Teaser for Ben's last post"
+   }
+  ]
+ },
+ "/api/v1/posts/by-id/1101": {
+  "post": {
+   "id": 1101,
+   "title": "Ben's last post",
+   "subtitle": null,
+   "canonical_url": "https://ben.substack.com/p/last",
+   "post_date": "2026-09-01T10:00:00.000Z",
+   "wordcount": 900,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 11010,
+     "name": "Author 1101"
+    }
+   ],
+   "truncated_body_text": "Teaser for Ben's last post",
+   "body_html": "<p>Ben wrote this.</p>"
+  }
+ },
+ "/api/v1/reader/feed/profile/10": {
+  "items": [
+   {
+    "context": {
+     "type": "post_like",
+     "timestamp": "2026-11-26T08:00:00.000Z"
+    },
+    "publication": {
+     "name": "Liked Pub"
+    },
+    "post": {
+     "id": 5001,
+     "title": "Liked essay",
+     "subtitle": null,
+     "canonical_url": "https://liked.example/p/essay",
+     "post_date": "2026-11-20T08:00:00.000Z",
+     "wordcount": 2300,
+     "reaction_count": 3,
+     "audience": "everyone",
+     "publishedBylines": [
+      {
+       "id": 50010,
+       "name": "Author 5001"
+      }
+     ],
+     "truncated_body_text": "Teaser for Liked essay"
+    }
+   },
+   {
+    "context": {
+     "type": "post_like",
+     "timestamp": "2026-08-01T08:00:00.000Z"
+    },
+    "publication": {
+     "name": "Old Pub"
+    },
+    "post": {
+     "id": 5002,
+     "title": "Old like",
+     "subtitle": null,
+     "canonical_url": "https://old.example/p/like",
+     "post_date": "2026-07-20T08:00:00.000Z",
+     "wordcount": 2300,
+     "reaction_count": 3,
+     "audience": "everyone",
+     "publishedBylines": [
+      {
+       "id": 50020,
+       "name": "Author 5002"
+      }
+     ],
+     "truncated_body_text": "Teaser for Old like"
+    }
+   },
+   {
+    "context": {
+     "type": "note",
+     "timestamp": "2026-11-26T09:00:00.000Z"
+    },
+    "publication": {
+     "name": "Ana"
+    },
+    "post": {
+     "id": 1001,
+     "title": "Ana's new post",
+     "subtitle": null,
+     "canonical_url": "https://ana.substack.com/p/new",
+     "post_date": "2026-11-25T10:00:00.000Z",
+     "wordcount": 1200,
+     "reaction_count": 3,
+     "audience": "everyone",
+     "publishedBylines": [
+      {
+       "id": 10,
+       "name": "Ana"
+      }
+     ],
+     "truncated_body_text": "Teaser for Ana's new post"
+    }
+   },
+   {
+    "context": {
+     "type": "comment",
+     "timestamp": "2026-11-26T09:00:00.000Z"
+    },
+    "post": {
+     "id": 5003,
+     "title": "Commented",
+     "subtitle": null,
+     "canonical_url": "https://c.example/p",
+     "post_date": "2026-11-20T08:00:00.000Z",
+     "wordcount": 100,
+     "reaction_count": 3,
+     "audience": "everyone",
+     "publishedBylines": [
+      {
+       "id": 50030,
+       "name": "Author 5003"
+      }
+     ],
+     "truncated_body_text": "Teaser for Commented"
+    }
+   }
+  ]
+ },
+ "/api/v1/reader/feed/profile/10?types%5B%5D=like": {
+  "items": [
+   {
+    "context": {
+     "type": "post_like",
+     "timestamp": "2026-11-26T08:00:00.000Z"
+    },
+    "publication": {
+     "name": "Liked Pub"
+    },
+    "post": {
+     "id": 5001,
+     "title": "Liked essay",
+     "subtitle": null,
+     "canonical_url": "https://liked.example/p/essay",
+     "post_date": "2026-11-20T08:00:00.000Z",
+     "wordcount": 2300,
+     "reaction_count": 3,
+     "audience": "everyone",
+     "publishedBylines": [
+      {
+       "id": 50010,
+       "name": "Author 5001"
+      }
+     ],
+     "truncated_body_text": "Teaser for Liked essay"
+    }
+   }
+  ]
+ },
+ "/api/v1/profile/posts?profile_user_id=100&limit=8": {
+  "posts": [
+   {
+    "id": 2001,
+    "title": "Roundup #1",
+    "subtitle": null,
+    "canonical_url": "https://roundup.example/p/1",
+    "post_date": "2026-11-26T07:00:00.000Z",
+    "wordcount": 9000,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 20010,
+      "name": "Author 2001"
+     }
+    ],
+    "truncated_body_text": "Teaser for Roundup #1"
+   },
+   {
+    "id": 2002,
+    "title": "Open thread",
+    "subtitle": null,
+    "canonical_url": "https://roundup.example/p/open",
+    "post_date": "2026-11-26T07:00:00.000Z",
+    "wordcount": 100,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 20020,
+      "name": "Author 2002"
+     }
+    ],
+    "truncated_body_text": "Teaser for Open thread"
+   },
+   {
+    "id": 2003,
+    "title": "Last month",
+    "subtitle": null,
+    "canonical_url": "https://roundup.example/p/old",
+    "post_date": "2026-10-26T07:00:00.000Z",
+    "wordcount": 9000,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 20030,
+      "name": "Author 2003"
+     }
+    ],
+    "truncated_body_text": "Teaser for Last month"
+   }
+  ]
+ },
+ "/api/v1/posts/by-id/2001": {
+  "post": {
+   "id": 2001,
+   "title": "Roundup #1",
+   "subtitle": null,
+   "canonical_url": "https://roundup.example/p/1",
+   "post_date": "2026-11-26T07:00:00.000Z",
+   "wordcount": 9000,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 20010,
+     "name": "Author 2001"
+    }
+   ],
+   "truncated_body_text": "Teaser for Roundup #1",
+   "body_html": "<h2>The Quest for Sane Regulations</h2><p>See <a href=\"https://news.example/a\">this</a> and <a href=\"https://shared.example/x/\">that</a>.</p><h2>Rhetorical Innovation</h2><p><img src=\"x\"><a href=\"https://substackcdn.com/image/fetch/pic.png\">img</a> <a href=\"https://x.com/someone/status/123\">tweet</a> <a href=\"https://roundup.example/subscribe\">sub</a></p>"
+  }
+ },
+ "/api/v1/profile/posts?profile_user_id=200&limit=8": {
+  "posts": [
+   {
+    "id": 3001,
+    "title": "An essay",
+    "subtitle": null,
+    "canonical_url": "https://essays.example/p/essay",
+    "post_date": "2026-11-24T07:00:00.000Z",
+    "wordcount": 4600,
+    "reaction_count": 3,
+    "audience": "only_paid",
+    "publishedBylines": [
+     {
+      "id": 30010,
+      "name": "Author 3001"
+     }
+    ],
+    "truncated_body_text": "Teaser for An essay"
+   }
+  ]
+ },
+ "/api/v1/posts/by-id/3001": {
+  "post": {
+   "id": 3001,
+   "title": "An essay",
+   "subtitle": null,
+   "canonical_url": "https://essays.example/p/essay",
+   "post_date": "2026-11-24T07:00:00.000Z",
+   "wordcount": 4600,
+   "reaction_count": 3,
+   "audience": "only_paid",
+   "publishedBylines": [
+    {
+     "id": 30010,
+     "name": "Author 3001"
+    }
+   ],
+   "truncated_body_text": "Teaser for An essay",
+   "body_html": "<p>Paid essay links <a href=\"https://shared.example/x\">x</a>.</p>"
+  }
+ },
+ "lesswrong": {
+  "data": {
+   "posts": {
+    "results": [
+     {
+      "title": "LW post",
+      "baseScore": 150,
+      "commentCount": 20,
+      "pageUrl": "https://www.lesswrong.com/posts/abc/lw-post",
+      "postedAt": "2026-11-23T12:00:00.000Z",
+      "wordCount": 3000,
+      "user": {
+       "displayName": "Writer"
+      },
+      "tags": [
+       {
+        "name": "AI"
+       }
+      ],
+      "contents": {
+       "plaintextDescription": "Plain text"
+      }
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "me": "richard594526",
+  "friends": [
+    {"name": "Gamithra", "handle": "gamithra", "recommendations": true, "rec_days": 30},
+    {"name": "Llela", "handle": "outsideourcave"},
+    {"name": "Sese", "handle": "amoretlicentia"}
+  ],
+  "roundups": ["Don't Worry About the Vase", "The EU AI Act: Newsletter & Podcast"],
+  "extra_seed_handles": [],
+  "signal_handles": ["outsideourcave", "amoretlicentia", "andrsgmezemilsson"]
+}

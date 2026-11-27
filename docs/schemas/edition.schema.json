@@ -1,0 +1,260 @@
+{
+  "$defs": {
+    "Colophon": {
+      "additionalProperties": false,
+      "properties": {
+        "checked": {
+          "title": "Checked",
+          "type": "string"
+        },
+        "blind": {
+          "title": "Blind",
+          "type": "string"
+        },
+        "requests_ok": {
+          "default": 0,
+          "title": "Requests Ok",
+          "type": "integer"
+        },
+        "requests_failed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requests Failed",
+          "type": "array"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        }
+      },
+      "required": [
+        "checked",
+        "blind"
+      ],
+      "title": "Colophon",
+      "type": "object"
+    },
+    "Item": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "news",
+            "essay",
+            "friend",
+            "edge",
+            "buzz",
+            "note"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "kicker": {
+          "title": "Kicker",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source"
+        },
+        "mins": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mins"
+        },
+        "body": {
+          "title": "Body",
+          "type": "string"
+        },
+        "why": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Why"
+        },
+        "more": {
+          "items": {
+            "$ref": "#/$defs/Link"
+          },
+          "title": "More",
+          "type": "array"
+        },
+        "seen": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seen"
+        }
+      },
+      "required": [
+        "kind",
+        "kicker",
+        "title",
+        "body"
+      ],
+      "title": "Item",
+      "type": "object"
+    },
+    "Link": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "url"
+      ],
+      "title": "Link",
+      "type": "object"
+    },
+    "Section": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/Item"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "note",
+        "items"
+      ],
+      "title": "Section",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "number": {
+      "title": "Number",
+      "type": "integer"
+    },
+    "date": {
+      "format": "date",
+      "title": "Date",
+      "type": "string"
+    },
+    "range": {
+      "title": "Range",
+      "type": "string"
+    },
+    "lede": {
+      "title": "Lede",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/Section"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "colophon": {
+      "$ref": "#/$defs/Colophon"
+    }
+  },
+  "required": [
+    "number",
+    "date",
+    "range",
+    "lede",
+    "sections",
+    "colophon"
+  ],
+  "title": "Edition",
+  "type": "object"
+}

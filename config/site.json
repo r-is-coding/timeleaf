@@ -1,0 +1,9 @@
+{
+  "base_url": "https://timeleaf.ee",
+  "site_name": "Timeleaf",
+  "publication": "The Loop",
+  "description": "A finite weekly newspaper on AI safety, AI policy and the writing around them, built from what trusted people pointed at.",
+  "language": "en",
+  "indexable": true,
+  "feedback_form_action": null
+}

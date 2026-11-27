@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "me": "reader",
+  "friends": [
+    {"name": "Ana", "handle": "ana", "recommendations": true, "rec_days": 30},
+    {"name": "Ben", "handle": "ben"}
+  ],
+  "roundups": ["Roundup Weekly"],
+  "extra_seed_handles": [],
+  "signal_handles": ["ana"]
+}
