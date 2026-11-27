@@ -1,0 +1,45 @@
+name: Source canary
+
+# Substack's API is undocumented. Check daily that the endpoints still answer with the shape we need.
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run timeleaf canary
+      - name: Open an issue after two failures in a row
+        if: failure()
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          previous=$(gh run list --workflow canary.yml --limit 2 --json conclusion --jq '.[1].conclusion')
+          [ "$previous" = "failure" ] || exit 0
+          gh label create canary-failed --color b60205 --force > /dev/null
+          existing=$(gh issue list --label canary-failed --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Still failing: $RUN_URL"
+          else
+            gh issue create --title "Source canary failing" --label canary-failed \
+              --body "The source canary failed twice in a row: $RUN_URL. See docs/runbook.md."
+          fi

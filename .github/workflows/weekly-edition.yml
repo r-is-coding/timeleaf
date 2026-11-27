@@ -1,0 +1,128 @@
+name: Weekly edition
+
+# Fetch -> Claude drafts -> validate -> open a PR. Merging the PR publishes the edition (deploy.yml).
+on:
+  schedule:
+    - cron: "0 5 * * 5" # Fridays 05:00 UTC (07:00 Tallinn in winter)
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Window in days
+        default: "7"
+      dry_run:
+        description: Fetch and estimate the cost only; do not call the model or open a PR
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-edition
+  cancel-in-progress: false
+
+jobs:
+  edition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: edition
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      # A GitHub App or fine-grained token, so that CI runs on the PR this job opens.
+      # Falls back to GITHUB_TOKEN, which works, but then CI does not trigger on the PR.
+      GH_TOKEN: ${{ secrets.EDITION_BOT_TOKEN || github.token }}
+      DAYS: ${{ inputs.days || '7' }}
+      DRY_RUN: ${{ inputs.dry_run || false }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ secrets.EDITION_BOT_TOKEN || github.token }}
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: Fetch candidates
+        run: |
+          echo "DATE=$(date -u +%F)" >> "$GITHUB_ENV"
+          uv run timeleaf fetch -o candidates.json --days "$DAYS"
+
+      - name: Keep candidates (90 days, never committed)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: candidates-${{ github.run_id }}
+          path: candidates.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Estimate cost (dry run)
+        if: env.DRY_RUN == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run timeleaf edit candidates.json --date "$DATE" --dry-run
+
+      - name: Draft edition with Claude
+        if: env.DRY_RUN != 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          uv run timeleaf edit candidates.json --date "$DATE" --report report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate (with provenance)
+        if: env.DRY_RUN != 'true'
+        run: uv run timeleaf validate "content/editions/$DATE.json" --candidates candidates.json
+
+      - name: Build preview
+        if: env.DRY_RUN != 'true'
+        run: uv run timeleaf build
+
+      - name: Upload preview
+        if: env.DRY_RUN != 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-${{ env.DATE }}
+          path: _site
+          retention-days: 30
+
+      - name: Open pull request
+        if: env.DRY_RUN != 'true'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          branch="edition/$DATE"
+          number=$(jq -r .number "content/editions/$DATE.json")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "content/editions/$DATE.json"
+          git commit -m "content: edition $number ($DATE)"
+          git push --force origin "$branch"
+          {
+            cat report.md
+            echo
+            echo "Preview: download \`preview-$DATE\` from [this run]($RUN_URL), unzip, and open it with"
+            echo "\`uv run timeleaf serve -d <folder>\`, or run \`uv run timeleaf build && uv run timeleaf serve\` on this branch."
+          } > pr-body.md
+          gh label create edition --color 0b6b4f --force > /dev/null
+          gh pr create --base main --head "$branch" --title "Edition $number · $DATE" \
+            --body-file pr-body.md --label edition
+
+      - name: Report failure
+        if: failure()
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create edition-failed --color b60205 --force > /dev/null
+          existing=$(gh issue list --label edition-failed --state open --json number --jq '.[0].number')
+          msg="The weekly edition run failed on $(date -u +%F): $RUN_URL"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$msg"
+          else
+            gh issue create --title "Weekly edition failed" --label edition-failed \
+              --body "$msg. See docs/runbook.md for what to do."
+          fi
