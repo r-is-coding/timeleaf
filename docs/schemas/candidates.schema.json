@@ -1,0 +1,377 @@
+{
+  "$defs": {
+    "CoCited": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "by": {
+          "items": {
+            "type": "string"
+          },
+          "title": "By",
+          "type": "array"
+        }
+      },
+      "required": [
+        "url",
+        "by"
+      ],
+      "title": "CoCited",
+      "type": "object"
+    },
+    "FriendCandidates": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "handle": {
+          "title": "Handle",
+          "type": "string"
+        },
+        "new_posts": {
+          "items": {
+            "$ref": "#/$defs/Post"
+          },
+          "title": "New Posts",
+          "type": "array"
+        },
+        "latest_post": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Post"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "recommended": {
+          "items": {
+            "$ref": "#/$defs/Post"
+          },
+          "title": "Recommended",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "handle"
+      ],
+      "title": "FriendCandidates",
+      "type": "object"
+    },
+    "Health": {
+      "additionalProperties": false,
+      "properties": {
+        "ok": {
+          "default": 0,
+          "title": "Ok",
+          "type": "integer"
+        },
+        "failed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Failed",
+          "type": "array"
+        },
+        "user_agent_fallback": {
+          "default": false,
+          "title": "User Agent Fallback",
+          "type": "boolean"
+        }
+      },
+      "title": "Health",
+      "type": "object"
+    },
+    "LessWrongPost": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "karma": {
+          "title": "Karma",
+          "type": "integer"
+        },
+        "comments": {
+          "title": "Comments",
+          "type": "integer"
+        },
+        "author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Author"
+        },
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "words": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Words"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "excerpt": {
+          "default": "",
+          "title": "Excerpt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "url",
+        "karma",
+        "comments",
+        "date"
+      ],
+      "title": "LessWrongPost",
+      "type": "object"
+    },
+    "Post": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subtitle"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "date": {
+          "default": "",
+          "title": "Date",
+          "type": "string"
+        },
+        "words": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Words"
+        },
+        "likes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Likes"
+        },
+        "paywalled": {
+          "default": false,
+          "title": "Paywalled",
+          "type": "boolean"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "excerpt": {
+          "default": "",
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "publication": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication"
+        },
+        "headings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Headings",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Links",
+          "type": "array"
+        },
+        "how": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "How"
+        },
+        "when": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "When"
+        },
+        "via": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Via"
+        }
+      },
+      "title": "Post",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated": {
+      "format": "date-time",
+      "title": "Generated",
+      "type": "string"
+    },
+    "window_days": {
+      "title": "Window Days",
+      "type": "integer"
+    },
+    "friends": {
+      "items": {
+        "$ref": "#/$defs/FriendCandidates"
+      },
+      "title": "Friends",
+      "type": "array"
+    },
+    "seeds": {
+      "items": {
+        "$ref": "#/$defs/Post"
+      },
+      "title": "Seeds",
+      "type": "array"
+    },
+    "signals": {
+      "items": {
+        "$ref": "#/$defs/Post"
+      },
+      "title": "Signals",
+      "type": "array"
+    },
+    "lesswrong": {
+      "items": {
+        "$ref": "#/$defs/LessWrongPost"
+      },
+      "title": "Lesswrong",
+      "type": "array"
+    },
+    "co_cited": {
+      "items": {
+        "$ref": "#/$defs/CoCited"
+      },
+      "title": "Co Cited",
+      "type": "array"
+    },
+    "health": {
+      "$ref": "#/$defs/Health"
+    }
+  },
+  "required": [
+    "generated",
+    "window_days"
+  ],
+  "title": "Candidates",
+  "type": "object"
+}

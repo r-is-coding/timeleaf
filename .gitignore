@@ -2,7 +2,7 @@
 _site/
 prototype/site/
 # fetched candidates contain third-party post bodies: never commit
-candidates*.json
+/candidates*.json
 # python
 __pycache__/
 *.py[cod]

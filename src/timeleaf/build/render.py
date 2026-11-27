@@ -70,12 +70,9 @@ def _env() -> Environment:
 
 
 def _asset_version() -> str:
-    h = hashlib.sha256()
-    for p in sorted(STATIC.rglob("*")):
-        if p.is_file():
-            h.update(p.name.encode())
-            h.update(p.read_bytes())
-    return h.hexdigest()[:10]
+    """Cache-busting token for style.css. Line endings are normalised so every OS builds the same bytes."""
+    css = (STATIC / "style.css").read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(css).hexdigest()[:10]
 
 
 def _feed_html(e: Edition) -> str:
