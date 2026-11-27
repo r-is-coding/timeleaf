@@ -8,7 +8,9 @@ Sources: docs/PLAN.md §1, docs/PLAN-buzz.md §1 and §3, and the reader's feedb
 
 ## Intent
 
-One reader works in AI safety advocacy and has left social media. They want to stay in the loop on AI safety and AI policy, and out of curiosity on rationalist, post-rationalist and contemplative writing. They want what people they trust are reading and arguing about, without a feed, in one calm place, once a week.
+Timeleaf makes each reader **their own weekly paper**: what the people they trust are reading and arguing about, on the subjects they care about, without a feed, in one calm and striking place, once a week. It is private to that reader.
+
+It started with one reader. They work in AI safety advocacy and have left social media, and their paper, *The Loop*, covers AI safety and AI policy first, and rationalist, post-rationalist and contemplative writing second. A friend's paper is next.
 
 ## Values
 
@@ -21,8 +23,15 @@ One reader works in AI safety advocacy and has left social media. They want to s
 7. **Friends always appear, and silence is not news.** Everything a friend publishes is included. Weeks when they publish nothing are not mentioned.
 8. **Honest about blind spots.** Each edition says what it checked, what failed, and what it cannot see.
 9. **Calm.** No likes, counts, streaks, notifications or infinite scroll. Feedback is given in words.
-10. **A person approves.** An AI drafts the paper; nothing is published until the reader approves it.
+10. **A person approves what goes public.** An AI drafts the paper. Nothing goes public without a person approving it. A private paper goes straight to its one reader after the automatic checks; the reader's feedback is the correction loop. *(Proposed in 0002; before that: every edition approved by the reader.)*
 11. **Respect writers.** Credit and link the original. Never republish others' work publicly. Paywalls are respected.
+12. **Private by default.** A reader's interests, sources and paper are theirs. No one else sees them, the owner of Timeleaf included, unless the reader shares. *(Proposed in 0002.)*
+
+### Design values
+
+13. **Usable first.** Easy to read on a phone at 7 a.m. and on a laptop at night: large text, short lines, obvious navigation, fast, works without JavaScript, accessible. When striking and usable conflict, usable wins.
+14. **Simple.** Few elements, and each one earns its place. No chrome, no badges, nothing that moves unless the reader moves it.
+15. **Striking and its own.** Recognisable from a single screenshot. It borrows the newspaper's *rituals*: masthead, dateline, sections, a lead story, an end. It does not imitate the newspaper's *material*: paper textures, cramped columns on a phone, tiny print. *(Proposed in 0003.)*
 
 ## User stories
 
@@ -37,7 +46,15 @@ As **the reader**:
 - **US-7** I know what the edition could not see, so I know what I might be missing. *(8)*
 - **US-8** I can tell the editor what to change in plain words. *(9)*
 
-As **the approver** (the same person, in another role):
+- **US-11** I can tell a story's importance and the size of the whole edition at a glance, before I start reading. *(5, 13, 15)*
+- **US-12** When I open my paper it feels like *my* paper, with its name, and it looks like nothing else I use. *(6, 15)*
+
+As **a new reader** (a friend of the owner):
+
+- **US-13** I set up my own paper in under 15 minutes by describing my interests and the people I trust, in my own words. *(2, 12)*
+- **US-14** I change what I get by writing feedback in words, and the next edition reflects it. *(9)*
+
+As **the approver** (for *The Loop*, the same person as its reader, in another role):
 
 - **US-9** I review and approve an edition in under 10 minutes, and nothing goes out without that. *(10)*
 
@@ -57,3 +74,5 @@ As **a writer whose work appears**:
 | Date | Change | Why |
 |---|---|---|
 | 2026-11-27 | First draft. Added values 3, 6 and the second half of 7 | Reader feedback round 1 |
+| 2026-11-27 | Intent widened to one private paper per reader; value 10 reworded; value 12 added; US-13, US-14 | Proposal 0002 (a friend gets their own paper) |
+| 2026-11-27 | Design values 13–15; US-11, US-12 | Owner: "striking and different, but core committed to usability and simplicity" (proposal 0003) |

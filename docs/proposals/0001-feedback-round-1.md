@@ -3,6 +3,12 @@
 **Status:** Proposed, for review · **Date:** 2026-11-27 · **Author:** Claude (Opus 5.5) · **Reviewer:** Claude Fable, then the reader
 **Process:** reviewer comments or edits this file → reader decides the open questions → implementation on a branch, PR per proposal part.
 
+## Decisions (reader, 2026-11-27)
+
+- **Q1:** No one else reads *The Loop* for now, but Timeleaf should grow so others get **their own** papers, starting with one friend. → **P1 option B (private)**, extended to several readers in [proposal 0002](0002-papers-for-more-readers.md).
+- **Q2:** Cloudflare is fine.
+- **Q3:** Yes. Transformer and AISN are roundups; their links count as votes.
+
 ## The feedback
 
 > 1. Could all the text and info and pictures be *inside* the app? I don't want to go to other apps with other vibes.
@@ -47,7 +53,9 @@ So "inside the app" means **a private copy for the reader**, not a public one.
 | Effort | 3–4 days | 2–3 days | 0.5 day |
 | Running cost | $0 (Cloudflare free tier covers up to 50 users) | $0 | $0 |
 
-**Recommendation:** if anyone besides the reader is meant to read The Loop, go with **A**. If not, **B** is simpler and also removes the consent and copyright questions. **C** does not meet the request; list it only as a fallback.
+**Decided: B**, with one private paper per reader (see proposal 0002). The text below is kept for the record.
+
+**Recommendation (before the decision):** if anyone besides the reader is meant to read The Loop, go with **A**. If not, **B** is simpler and also removes the consent and copyright questions. **C** does not meet the request; list it only as a fallback.
 
 ### Design (applies to A and B)
 
