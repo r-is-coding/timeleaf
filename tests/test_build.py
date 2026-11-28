@@ -275,10 +275,19 @@ def contrast(a: str, b: str) -> float:
 def palettes() -> list[dict[str, str]]:
     """The day and night token sets, read from the stylesheet itself."""
     css = (ROOT / "src/timeleaf/build/static/style.css").read_text(encoding="utf-8")
-    blocks = re.findall(r":root\{[^}]*\}", css)
-    found = [t for t in (dict(re.findall(r"--(\w+):(#[0-9a-f]{6})", b)) for b in blocks) if t]
-    assert len(found) == 2
-    return found
+
+    def tokens(selector: str) -> dict[str, str]:
+        blocks = re.findall(re.escape(selector) + r"\{([^}]*)\}", css)
+        found = [t for t in (dict(re.findall(r"--(\w+):(#[0-9a-f]{6})", b)) for b in blocks) if t]
+        assert len(found) == 1, selector
+        return found[0]
+
+    day = tokens("\n:root")
+    night = tokens('@media (prefers-color-scheme:dark){:root:not([data-theme="light"])')
+    forced = tokens('\n:root[data-theme="dark"]')
+    assert night == forced, "the two night-edition blocks must stay identical"
+    assert set(day) == set(night)
+    return [day, night]
 
 
 def test_palette_meets_wcag_in_both_modes() -> None:

@@ -25,11 +25,12 @@
 --s1:8px;--s2:16px;--s3:24px;--s4:40px;--s5:64px;--s6:104px;
 color-scheme:light}
 /* Night edition: its own palette (deep ink-blue, cream type, a warmer accent), not an inversion. */
-@media (prefers-color-scheme:dark){:root{--paper:#10141f;--wash:#191f2e;--ink:#ece5d5;--muted:#a8a293;--rule:#333a4d;--accent:#ff8a6b;color-scheme:dark}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#10141f;--wash:#191f2e;--ink:#ece5d5;--muted:#a8a293;--rule:#333a4d;--accent:#ff8a6b;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#10141f;--wash:#191f2e;--ink:#ece5d5;--muted:#a8a293;--rule:#333a4d;--accent:#ff8a6b;color-scheme:dark}
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.55;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.55;overflow-wrap:break-word;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility}
 h1,h2,h3,p,ol,ul{margin:0}
 ol,ul{padding:0}
 .wrap{max-width:1120px;margin:0 auto;padding-block:0 var(--s5);padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
@@ -43,7 +44,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .skip:focus{left:var(--gutter)}
 
 /* Labels: the small voice. Fraunces capitals, letterspaced. */
-.label,.topnav,.dateline,.kicker,.folio,.index h2,.index .m,.why b,.count,.colophon h2,.pager,.archive .no,.feedback label,.backlink{font-family:var(--display);font-weight:600;font-size:.8125rem;line-height:1.3;letter-spacing:.09em;text-transform:uppercase;font-variant-numeric:lining-nums}
+.label,.topnav,.dateline,.kicker,.folio,.index h2,.index .m,.why b,.count,.colophon h2,.pager,.archive .no,.feedback label,.backlink{font-family:var(--display);font-weight:600;font-size:.875rem;line-height:1.3;letter-spacing:.08em;text-transform:uppercase;font-variant-numeric:lining-nums}
 
 /* Top navigation */
 .topnav{display:flex;justify-content:space-between;align-items:center;gap:var(--s2)}
@@ -55,11 +56,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* Masthead: the paper's name as a poster, then the dateline between rules. */
 .mast{border-top:4px solid var(--ink)}
 .mast h1,.title{font-family:var(--display);font-weight:900;font-variation-settings:"opsz" 144;line-height:.86;letter-spacing:-.03em;text-wrap:balance;overflow-wrap:anywhere}
-.mast h1{font-size:min(22.5vw,264px);padding:.11em 0 .27em;margin-left:-.035em;white-space:nowrap}
-.mast h1.mid{font-size:min(13vw,168px);white-space:normal}
-.mast h1.long{font-size:min(9.5vw,120px);white-space:normal}
+.mast h1{font-size:min(22vw,260px);padding:.11em 0 .27em;margin-left:-.035em}
+.mast h1.mid{font-size:min(13vw,168px)}
+.mast h1.long{font-size:min(9.5vw,120px)}
 .dateline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px var(--s3);padding:11px 0 10px;border-top:1px solid var(--ink);border-bottom:4px double var(--ink)}
-@media (prefers-color-scheme:dark){.dateline .no::after{content:" · Night edition";color:var(--accent)}}
 
 /* Cover: the week in a sentence, the lead story, the index. */
 .lede{font-family:var(--display);font-weight:400;font-size:clamp(1.375rem,1rem + 1.6vw,2rem);line-height:1.25;max-width:26em;padding:var(--s4) 0;text-wrap:pretty}
@@ -111,7 +111,7 @@ section{padding-bottom:var(--s4)}
 .note h3{font-weight:500;font-size:1.375rem}
 
 /* Why it is here: a different voice (italic), set off by an accent rule. On every item. */
-.why{margin-top:var(--s2);padding:2px 0 2px 14px;border-left:3px solid var(--accent);font-style:italic;font-size:1rem;line-height:1.45;color:var(--muted)}
+.why{margin-top:var(--s2);padding:2px 0 2px 14px;border-left:3px solid var(--accent);font-style:italic;font-size:1.0625rem;line-height:1.45;color:var(--muted)}
 .why b{display:block;font-style:normal;color:var(--accent);padding-bottom:3px}
 
 /* The end */

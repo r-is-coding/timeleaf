@@ -35,7 +35,7 @@ Scale (rem; 1rem = the reader's browser setting, normally 16 px):
 
 | Token | Size | Face | Used for |
 |---|---|---|---|
-| Masthead | `min(22.5vw, 264px)`; 13vw / 9.5vw for longer names | Fraunces 900, opsz 144, line-height .86, tracking −.03em | The paper's name (`h1`) |
+| Masthead | `min(22vw, 260px)`; 13vw / 9.5vw for longer names; wraps if it must | Fraunces 900, opsz 144, line-height .86, tracking −.03em | The paper's name (`h1`) |
 | End | `clamp(3rem, 1.5rem + 8vw, 7.5rem)` | Fraunces 900, opsz 144 | "That is all for this week." |
 | Page title | `clamp(4rem, 2rem + 13vw, 11rem)` | Fraunces 900, opsz 144 | Archive, About, 404 |
 | Section | `clamp(2.5rem, 1.6rem + 4.6vw, 4.5rem)` | Fraunces 800, opsz 144 | Section openers |
@@ -44,7 +44,7 @@ Scale (rem; 1rem = the reader's browser setting, normally 16 px):
 | Headline | `clamp(1.5rem, 1.25rem + 1.1vw, 1.9375rem)` | Fraunces 600, line-height 1.12 | Item headlines (`h3`) |
 | Body | 1.125rem (18 px) on phones, 1.25rem (20 px) from 720 px; line-height 1.55 | Source Serif 4 400 | Everything you read |
 | Small | 1rem | Source Serif 4 | Source line, why-line, colophon, index total |
-| Label | .8125rem (13 px), capitals, tracking .09em | Fraunces 600 | Kickers, dateline, orientation, navigation, reading times |
+| Label | .875rem (14 px), capitals, tracking .08em | Fraunces 600 | Kickers, dateline, orientation, navigation, reading times |
 
 Headlines use `text-wrap: balance` and running text `text-wrap: pretty`, so headlines do not end on a single short word.
 
@@ -74,7 +74,7 @@ One fixed look for every paper. Ratios are WCAG 2.2 contrast against paper / aga
 | `--accent` | `#ff8a6b` | 7.97 (AAA) | 7.13 (AAA) |
 | `--rule` | `#333a4d` | 1.62 | |
 
-The night edition is a designed palette: blue-black instead of black, cream instead of white to cut glare, and a warmer, lighter vermilion. The dateline also says "Night edition" in the accent (CSS-generated, decorative).
+The night edition is a designed palette: blue-black instead of black, cream instead of white to cut glare, and a warmer, lighter vermilion. It applies under `prefers-color-scheme: dark` unless the page carries `data-theme="light"`, and always under `data-theme="dark"`.
 
 ### Space and measure
 
@@ -94,7 +94,7 @@ Rules: 4 px ink (masthead top, index top, section openers, the end), 1 px ink (d
 - **Masthead.** A 4 px rule, the paper's name on one line filling the width, then the dateline between a hairline and a double rule: edition number, weekday and date, the week covered. Names longer than 9 or 16 characters step down a size and may wrap (class `mid` / `long`), so per-reader paper names fit without scripts.
 - **Lede.** The edition's one-paragraph summary, large, directly under the dateline.
 - **Lead story.** The first item, lifted onto the cover: kicker, a very large headline, then the item as usual. Its number in the rail is in the accent. The first section, further down, continues from item 2.
-- **Index** (`nav`, labelled "In this edition"). The total line reads "18 items · about 6 min to read here · 3 h 45 min behind the links". Then every section with its items: number, headline, reading time. Each line is one link (at least 48 px tall) to the item's anchor (`#item-N`). One column on phones; two newspaper columns with a hairline between them from 720 px. Items without a reading time get an estimate from their body at 230 words a minute.
+- **Index** (`nav`, labelled "In this edition"). The total line reads "18 items · about 6 min here · 3 h 45 min if you open everything". Then every section with its items: number, headline, reading time. Each line is one link (at least 48 px tall) to the item's anchor (`#item-N`). One column on phones; two newspaper columns with a hairline between them from 720 px. Items without a reading time get an estimate from their body at 230 words a minute.
 - **Section opener.** Full-width 4 px rule, the section name in large display type, its note in italic, and the range it covers ("6–8 of 18").
 - **Item.** Orientation ("Policy desk · 4 of 18"), kicker in the accent, headline, source and reading time, body, further links, why-line. From 960 px the orientation moves into the left rail under a large light numeral that matches the index number. Headlines are not underlined; a small drawn arrow in the accent marks one that leaves the paper, and hover or keyboard focus turns it accent-coloured and underlined.
 - **Why-line.** "Why it is here" on every item that has a reason. It is visibly a different voice: italic, muted, one size down, with a label in accent capitals and a 3 px accent rule on its left.
