@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "me": "richard594526",
+  "friends": [
+    {"name": "Gamithra", "handle": "gamithra", "recommendations": true, "rec_days": 30},
+    {"name": "Llela", "handle": "outsideourcave"},
+    {"name": "Sese", "handle": "amoretlicentia"}
+  ],
+  "publications": [
+    {"name": "Transformer", "url": "https://www.transformernews.ai"},
+    {"name": "AI Safety Newsletter", "url": "https://newsletter.safe.ai"}
+  ],
+  "roundups": [
+    "Don't Worry About the Vase",
+    "The EU AI Act: Newsletter & Podcast",
+    "Transformer",
+    "AI Safety Newsletter"
+  ],
+  "extra_seed_handles": [],
+  "signal_handles": ["outsideourcave", "amoretlicentia", "andrsgmezemilsson"],
+  "lesswrong": true
+}

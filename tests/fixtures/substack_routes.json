@@ -406,5 +406,139 @@
     ]
    }
   }
+ },
+ "fieldnotes.example/api/v1/archive?sort=new&limit=12": [
+  {
+   "id": 4001,
+   "title": "Field notes #7",
+   "subtitle": null,
+   "canonical_url": "https://fieldnotes.example/p/notes",
+   "post_date": "2026-11-25T07:00:00.000Z",
+   "wordcount": 2500,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 40010,
+     "name": "Author 4001"
+    }
+   ],
+   "truncated_body_text": "Teaser for Field notes #7"
+  },
+  {
+   "id": 4002,
+   "title": "Housekeeping",
+   "subtitle": null,
+   "canonical_url": "https://fieldnotes.example/p/admin",
+   "post_date": "2026-11-25T07:00:00.000Z",
+   "wordcount": 80,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 40020,
+     "name": "Author 4002"
+    }
+   ],
+   "truncated_body_text": "Teaser for Housekeeping"
+  },
+  {
+   "id": 2001,
+   "title": "Roundup #1",
+   "subtitle": null,
+   "canonical_url": "https://roundup.example/p/1",
+   "post_date": "2026-11-26T07:00:00.000Z",
+   "wordcount": 9000,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 20010,
+     "name": "Author 2001"
+    }
+   ],
+   "truncated_body_text": "Teaser for Roundup #1"
+  },
+  {
+   "no": "id"
+  }
+ ],
+ "/api/v1/posts/by-id/4001": {
+  "post": {
+   "id": 4001,
+   "title": "Field notes #7",
+   "subtitle": null,
+   "canonical_url": "https://fieldnotes.example/p/notes",
+   "post_date": "2026-11-25T07:00:00.000Z",
+   "wordcount": 2500,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 40010,
+     "name": "Author 4001"
+    }
+   ],
+   "truncated_body_text": "Teaser for Field notes #7",
+   "body_html": "<h2>This week</h2><p>Story 1: <a href=\"https://story1.example/s?utm_source=x\">what <em>happened</em></a>.</p><p>Story 2: <a href=\"https://story2.example/s?utm_source=x\">what <em>happened</em></a>.</p><p>Story 3: <a href=\"https://story3.example/s?utm_source=x\">what <em>happened</em></a>.</p><p>Story 4: <a href=\"https://story4.example/s?utm_source=x\">what <em>happened</em></a>.</p><p>Story 5: <a href=\"https://story5.example/s?utm_source=x\">what <em>happened</em></a>.</p><p>Story 6: <a href=\"https://story6.example/s?utm_source=x\">what <em>happened</em></a>.</p><p><a href=\"https://substackcdn.com/image/a.png\"><img src=\"a\"></a> <a href=\"https://fieldnotes.example/subscribe\">Subscribe</a> <a href=\"https://shared.example/x\">again</a></p>"
+  }
+ },
+ "digest.example/api/v1/archive?sort=new&limit=12": {
+  "posts": [
+   {
+    "id": 5001,
+    "title": "The digest",
+    "subtitle": null,
+    "canonical_url": "https://digest.example/p/digest",
+    "post_date": "2026-11-25T07:00:00.000Z",
+    "wordcount": 1500,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 50010,
+      "name": "Author 5001"
+     }
+    ],
+    "truncated_body_text": "Teaser for The digest"
+   },
+   {
+    "id": 5002,
+    "title": "Old digest",
+    "subtitle": null,
+    "canonical_url": "https://digest.example/p/old",
+    "post_date": "2026-10-01T07:00:00.000Z",
+    "wordcount": 1500,
+    "reaction_count": 3,
+    "audience": "everyone",
+    "publishedBylines": [
+     {
+      "id": 50020,
+      "name": "Author 5002"
+     }
+    ],
+    "truncated_body_text": "Teaser for Old digest"
+   }
+  ]
+ },
+ "/api/v1/posts/by-id/5001": {
+  "post": {
+   "id": 5001,
+   "title": "The digest",
+   "subtitle": null,
+   "canonical_url": "https://digest.example/p/digest",
+   "post_date": "2026-11-25T07:00:00.000Z",
+   "wordcount": 1500,
+   "reaction_count": 3,
+   "audience": "everyone",
+   "publishedBylines": [
+    {
+     "id": 50010,
+     "name": "Author 5001"
+    }
+   ],
+   "truncated_body_text": "Teaser for The digest",
+   "body_html": "<p>Digest body.</p>"
+  }
  }
 }

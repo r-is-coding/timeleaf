@@ -1,13 +1,17 @@
 """The editor step: Claude drafts an edition from candidates (ADR 0003).
 
-The model writes the editorial content (a ``Draft``). Code adds number, dates and the colophon facts,
+The model writes the editorial content (a ``Draft``). Code adds number, dates and the whole colophon,
 validates the result, and gives the model one chance to repair any errors.
+
+The system prompt is ``prompt.md`` (the values, the same for every reader) with one reader's profile,
+notes and sections inserted. It changes only when that reader's folder changes, so it is cache-marked.
 """
 
 from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from importlib import resources
@@ -15,7 +19,9 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
-from timeleaf.models import Candidates, Colophon, Draft, Edition, Item, Link, Section, Sources
+from timeleaf.blind import blind_text, platforms
+from timeleaf.models import Candidates, Colophon, Draft, Edition, Item, Link, Reader, Section, Sources
+from timeleaf.readers import ReaderHome
 from timeleaf.validate import Finding, errors, validate
 
 MODEL = "claude-opus-5-5"
@@ -82,8 +88,24 @@ Call = Callable[[str, list[dict[str, Any]]], Reply]
 # --------------------------------------------------------------------------- prompt
 
 
-def system_prompt() -> str:
-    return resources.files("timeleaf.edit").joinpath("prompt.md").read_text(encoding="utf-8")
+def sections_table(reader: Reader) -> str:
+    rows = ["| id | title | note | item kind |", "|---|---|---|---|"]
+    rows += [f"| `{s.id}` | {s.title} | {s.note} | `{s.kind}` |" for s in reader.sections]
+    return "\n".join(rows)
+
+
+def system_prompt(home: ReaderHome) -> str:
+    """The generic editor instructions with this reader's profile, notes and sections inserted."""
+    template = resources.files("timeleaf.edit").joinpath("prompt.md").read_text(encoding="utf-8")
+    inserts = {
+        "{{PAPER_NAME}}": home.reader.paper_name,
+        "{{PROFILE}}": home.profile.strip(),
+        "{{NOTES}}": home.notes.strip() or "(no notes yet)",
+        "{{SECTIONS}}": sections_table(home.reader),
+    }
+    # One pass over the template, so text a reader wrote is never itself searched for placeholders.
+    pattern = re.compile("|".join(re.escape(k) for k in inserts))
+    return pattern.sub(lambda m: inserts[m.group(0)], template)
 
 
 def strict_schema(model: type[BaseModel]) -> dict[str, Any]:
@@ -114,7 +136,7 @@ def user_message(c: Candidates, sources: Sources, previous: Edition | None, date
         f"This edition covers {start.isoformat()} to {date.isoformat()}.",
         "Friends (every new post must appear): "
         + ", ".join(f"{f.name} (@{f.handle})" for f in sources.friends),
-        "Roundup publications: " + ", ".join(sources.roundups),
+        "Roundup publications: " + (", ".join(sources.roundups) or "none"),
     ]
     if previous:
         prev = previous.model_dump(mode="json", include={"number", "date", "lede", "sections"})
@@ -138,18 +160,26 @@ def date_range(start: dt.date, end: dt.date) -> str:
     return f"{start.day}–{end.day} {end:%B %Y}"
 
 
-def checked_text(c: Candidates, items: int) -> str:
+def checked_text(c: Candidates, items: int, sources: Sources) -> str:
     h = c.health
     failed = len(h.failed)
+    read = [f"{len(c.seeds)} posts from the newsletters you follow"]
+    if sources.lesswrong:
+        read.append(f"{len(c.lesswrong)} top LessWrong posts")
+    read.append(f"{len(c.signals)} likes or restacks from your circle")
     return (
-        f"{h.total} requests to Substack and LessWrong, {failed or 'none'} failed. "
-        f"{len(c.seeds)} posts from your subscriptions, {len(c.lesswrong)} top LessWrong posts and "
-        f"{len(c.signals)} likes or restacks from your circle were read; {items} items made the edition."
+        f"{h.total} requests to {' and '.join(platforms(sources))}, {failed or 'none'} failed. "
+        f"{', '.join(read[:-1])} and {read[-1]} were read; {items} items made the edition."
     )
 
 
 def assemble(
-    draft: Draft, c: Candidates, previous: Edition | None, date: dt.date, stats: RunStats
+    draft: Draft,
+    c: Candidates,
+    home: ReaderHome,
+    previous: Edition | None,
+    date: dt.date,
+    stats: RunStats,
 ) -> Edition:
     sections = [
         Section(
@@ -182,8 +212,8 @@ def assemble(
         lede=draft.lede,
         sections=sections,
         colophon=Colophon(
-            checked=checked_text(c, n_items),
-            blind=draft.blind,
+            checked=checked_text(c, n_items, home.sources),
+            blind=blind_text(home.sources, home.reader),
             requests_ok=c.health.ok,
             requests_failed=c.health.failed,
             model=MODEL_NAMES.get(stats.model, stats.model),
@@ -197,14 +227,16 @@ def assemble(
 
 def edit(
     c: Candidates,
-    sources: Sources,
+    home: ReaderHome,
     previous: Edition | None,
     date: dt.date,
     call: Call,
     max_repairs: int = 1,
 ) -> tuple[Edition, RunStats]:
-    system = system_prompt()
-    messages: list[dict[str, Any]] = [{"role": "user", "content": user_message(c, sources, previous, date)}]
+    system = system_prompt(home)
+    messages: list[dict[str, Any]] = [
+        {"role": "user", "content": user_message(c, home.sources, previous, date)}
+    ]
     stats = RunStats()
     for attempt in range(max_repairs + 1):
         reply = call(system, messages)
@@ -217,8 +249,8 @@ def edit(
         edition: Edition | None = None
         try:
             draft = Draft.model_validate_json(reply.text)
-            edition = assemble(draft, c, previous, date, stats)
-            stats.findings = validate(edition, c)
+            edition = assemble(draft, c, home, previous, date, stats)
+            stats.findings = validate(edition, c, home.reader, home.sources)
             problems = [str(f) for f in errors(stats.findings)]
         except ValidationError as e:
             problems = [f"Output did not match the schema: {e}"]
@@ -275,11 +307,11 @@ def anthropic_call(client: Any, model: str = MODEL, effort: str = EFFORT) -> Cal
 
 
 def estimate_cost(
-    client: Any, c: Candidates, sources: Sources, previous: Edition | None, date: dt.date
+    client: Any, c: Candidates, home: ReaderHome, previous: Edition | None, date: dt.date
 ) -> float:
     count = client.messages.count_tokens(
         model=MODEL,
-        system=system_prompt(),
-        messages=[{"role": "user", "content": user_message(c, sources, previous, date)}],
+        system=system_prompt(home),
+        messages=[{"role": "user", "content": user_message(c, home.sources, previous, date)}],
     )
     return cost({"input_tokens": count.input_tokens, "output_tokens": ASSUMED_OUTPUT_TOKENS})

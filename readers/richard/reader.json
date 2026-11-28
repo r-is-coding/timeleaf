@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "richard",
+  "paper_name": "The Loop",
+  "email": null,
+  "timezone": "Europe/Tallinn",
+  "publish_day": "friday",
+  "sections": [
+    {
+      "id": "front-page",
+      "title": "Front page",
+      "note": "Five things you would be asked about at work.",
+      "kind": "news"
+    },
+    {
+      "id": "policy-desk",
+      "title": "Policy desk",
+      "note": "Short. Read here, click only if you need the detail.",
+      "kind": "news"
+    },
+    {
+      "id": "movement",
+      "title": "For the movement",
+      "note": "Posts about advocacy itself.",
+      "kind": "news"
+    },
+    {
+      "id": "worth-your-time",
+      "title": "Worth your time",
+      "note": "Essays. No summaries, only a reason to read.",
+      "kind": "essay"
+    },
+    {
+      "id": "friends",
+      "title": "From your friends",
+      "note": "Everything they post appears here, always.",
+      "kind": "friend"
+    },
+    {
+      "id": "edges",
+      "title": "From the edges",
+      "note": "Things your circle pointed at.",
+      "kind": "edge"
+    }
+  ],
+  "review": "pr",
+  "max_cost_usd": 3.0,
+  "blind_spots": [
+    "PauseAI's internal channels"
+  ]
+}

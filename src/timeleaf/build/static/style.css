@@ -52,6 +52,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .topnav a{display:inline-flex;align-items:center;min-height:48px;padding:0 10px;text-decoration:none;color:var(--muted)}
 .topnav a:hover,.topnav a[aria-current]{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px}
 .topnav .brand{padding-left:0;color:var(--ink)}
+/* Small phones: tighter tracking and padding so the site name and all three links fit on one line. */
+@media (max-width:400px){.topnav{gap:0}.topnav,.topnav a{letter-spacing:.03em}.topnav a{padding:0 6px}.topnav ul{margin-right:-6px}}
 
 /* Masthead: the paper's name as a poster, then the dateline between rules. */
 .mast{border-top:4px solid var(--ink)}
@@ -108,7 +110,6 @@ section{padding-bottom:var(--s4)}
 .body{margin-top:12px;text-wrap:pretty;hanging-punctuation:first}
 .more{list-style:none;margin-top:12px;font-size:1rem;display:flex;flex-wrap:wrap;gap:0 var(--s3)}
 .more a{display:inline-flex;align-items:center;min-height:44px}
-.note h3{font-weight:500;font-size:1.375rem}
 
 /* Why it is here: a different voice (italic), set off by an accent rule. On every item. */
 .why{margin-top:var(--s2);padding:2px 0 2px 14px;border-left:3px solid var(--accent);font-style:italic;font-size:1.0625rem;line-height:1.45;color:var(--muted)}

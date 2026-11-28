@@ -79,7 +79,7 @@
     <p class="count">{% if rest | length > 1 %}{{ rest[0].n }}–{{ rest[-1].n }}{% else %}{{ rest[0].n }}{% endif %} of {{ c.count }}</p>
   </header>
   {% for x in rest %}
-  <article class="item{% if x.item.kind == 'note' %} note{% endif %}" id="{{ x.anchor }}">
+  <article class="item" id="{{ x.anchor }}">
     {{ folio(x, s, c) }}
 {{ story(x, 3) }}
   </article>

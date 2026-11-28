@@ -1,6 +1,8 @@
 """Data contracts between the pipeline stages (ADR 0004).
 
-Sources  -> fetch -> Candidates -> edit -> Edition -> build -> HTML
+Reader + Sources -> fetch -> Candidates -> edit -> Edition -> build -> HTML
+
+Everything that belongs to one reader lives in ``readers/<id>/`` (see ``timeleaf.readers``).
 
 Every persisted file carries ``schema_version``. Bump it on a breaking change.
 """
@@ -24,6 +26,9 @@ def _http_url(value: str) -> str:
 HttpUrlStr = Annotated[str, AfterValidator(_http_url)]
 
 
+ItemKind = Literal["news", "essay", "friend", "edge", "buzz"]
+
+
 class _Model(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -38,15 +43,73 @@ class Friend(_Model):
     rec_days: int = 7
 
 
+class Publication(_Model):
+    """A Substack publication read through its own archive, whether or not the reader subscribes to it."""
+
+    name: str
+    url: HttpUrlStr = Field(description="The publication's home, e.g. https://newsletter.example")
+
+
 class Sources(_Model):
     schema_version: Literal[1] = 1
-    me: str = Field(description="The reader's Substack handle; their subscriptions are the seeds.")
-    friends: list[Friend]
+    me: str | None = Field(
+        default=None,
+        description="The reader's Substack handle, if they have one; their subscriptions are seeds.",
+    )
+    friends: list[Friend] = Field(default_factory=list)
+    publications: list[Publication] = Field(
+        default_factory=list, description="Publications fetched directly, like seeds"
+    )
     roundups: list[str] = Field(
-        default_factory=list, description="Publication names whose links count as votes"
+        default_factory=list,
+        description="Names of publications whose links count as votes and whose excerpts keep their links",
     )
     extra_seed_handles: list[str] = Field(default_factory=list)
     signal_handles: list[str] = Field(default_factory=list)
+    lesswrong: bool = Field(default=True, description="Read the week's top LessWrong posts")
+
+
+# --------------------------------------------------------------------------- reader
+
+Slug = Annotated[str, Field(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$", max_length=40)]
+
+
+class SectionSpec(_Model):
+    """One section of a reader's paper. The editor uses these ids, titles and notes exactly."""
+
+    id: Slug
+    title: str
+    note: str
+    kind: ItemKind = Field(description="The kind of item this section holds")
+
+
+class Reader(_Model):
+    """``readers/<id>/reader.json``: one reader and the shape of their paper."""
+
+    schema_version: Literal[1] = 1
+    id: Slug = Field(description="Same as the folder name")
+    paper_name: str = Field(min_length=1)
+    email: str | None = Field(default=None, description="The address the reader will log in with")
+    timezone: str = "Europe/Tallinn"
+    publish_day: Literal["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] = (
+        "friday"
+    )
+    sections: list[SectionSpec] = Field(min_length=1)
+    review: Literal["pr", "auto"] = Field(
+        default="pr",
+        description="pr: a person approves each edition in a pull request. "
+        "auto: the edition goes straight to its one reader after the automatic checks "
+        "(only for papers that are not public).",
+    )
+    max_cost_usd: float = Field(default=2.0, gt=0, description="Cap on the model cost of one edition")
+    blind_spots: list[str] = Field(
+        default_factory=list,
+        description="Things this reader's paper cannot see, beyond the ones the code knows about, "
+        "each phrased to follow 'This edition cannot see ...'",
+    )
+
+    def section(self, section_id: str) -> SectionSpec | None:
+        return next((s for s in self.sections if s.id == section_id), None)
 
 
 # --------------------------------------------------------------------------- candidates
@@ -120,9 +183,6 @@ class Candidates(_Model):
 
 # --------------------------------------------------------------------------- edition
 
-# "note" is a short editorial line with no link, e.g. "Your friends did not publish this week".
-ItemKind = Literal["news", "essay", "friend", "edge", "buzz", "note"]
-
 
 class Link(_Model):
     label: str
@@ -150,8 +210,8 @@ class Section(_Model):
 
 
 class Colophon(_Model):
-    checked: str
-    blind: str
+    checked: str = Field(description="Written by code from the request ledger")
+    blind: str = Field(description="What the edition cannot see. Written by code (timeleaf.blind)")
     requests_ok: int = 0
     requests_failed: list[str] = Field(default_factory=list)
     model: str | None = None
@@ -209,4 +269,3 @@ class Draft(_Model):
 
     lede: str
     sections: list[DraftSection]
-    blind: str = Field(description="One short paragraph: what this edition cannot see.")

@@ -14,27 +14,21 @@ Related documents:
 
 ## 1. Product summary
 
-**The reader** works in AI safety advocacy, has left social media, and wants to stay informed on AI safety and policy (plus rationalist / post-rationalist / contemplative writing) through people they trust rather than a feed.
+**What Timeleaf is for, its values and its user stories are in [`docs/PRINCIPLES.md`](PRINCIPLES.md).** That page is the only place the product rules are written down; this plan, the editor's prompt and the validator refer to it. Changes to it are decided by the owner and recorded in [`docs/proposals/DECISIONS.md`](proposals/DECISIONS.md).
 
-**The product** is one finite edition per week, about 15–18 items, ending with *"That is all for this week."* Every item says *why it is here* and who pointed at it. A colophon states what was checked, what failed, and what the edition cannot see.
+In one line: each reader gets their own finite weekly paper, built from what people they trust pointed at. The first paper is *The Loop*, for the owner.
 
-**How an edition is made** (already proven by the prototype):
+**How an edition is made**, for each reader in `readers/`:
 
 ```
- sources.json ──► FETCH ──► candidates.json ──► EDIT (Claude) ──► editions/DATE.json ──► BUILD ──► static HTML
-                 (Substack,                      (selects, writes,                        (render)
-                  LessWrong)                      explains "why")
+ readers/<id>/ ──► FETCH ──► candidates.json ──► EDIT (Claude) ──► readers/<id>/editions/DATE.json ──► BUILD ──► static HTML
+ (sources.json)   (Substack,                    (profile.md, notes.md,                               (render)
+                   LessWrong)                    sections from reader.json)
 ```
 
-### Product rules (fixed — see PLAN-buzz §1; do not reopen without the owner)
+### Product rules
 
-1. Weekly, finite, capped at ~15–18 items.
-2. Every item has a "why it is here" line naming who pointed at it.
-3. News is compressed. Essays get a pitch and a reading time, never a summary.
-4. Public static website.
-5. No like buttons or engagement metrics. Feedback is given in words.
-6. Colophon is honest about coverage and failures.
-7. Everything posted by the three named friends appears, always.
+See [`docs/PRINCIPLES.md`](PRINCIPLES.md) (values 1–15). They are not repeated here.
 
 ### Goals of this project
 
@@ -48,7 +42,7 @@ Related documents:
 
 ### Non-goals (v1)
 
-- Multiple readers / accounts / personalisation for others.
+- Accounts, logins and self-service sign-up. (Several readers, each with their own folder and paper, are supported since proposal 0002 phase 1; private hosting per reader is phase 2.)
 - Comments, likes, or any client-side app.
 - A CMS. Content is JSON in git; GitHub's web editor is the CMS.
 - Reading X directly (that is Buzz Stage 1, after v1).
@@ -105,32 +99,40 @@ timeleaf/
 │   ├── dependabot.yml
 │   └── pull_request_template.md
 ├── config/
-│   └── sources.json             # friends, seeds, roundups, signal handles
-├── content/
-│   └── editions/YYYY-MM-DD.json # one file per published edition (source of truth)
+│   └── site.json                # the site: domain, indexing, feedback form, primary_reader
+├── readers/
+│   └── <id>/                    # everything about one reader, and nothing about anyone else
+│       ├── reader.json          # paper name, sections, review mode, cost cap, own blind spots
+│       ├── profile.md           # who the reader is and what they care about, in their words
+│       ├── sources.json         # Substack handle, friends, publications, roundups, signals
+│       ├── notes.md             # the reader's standing feedback, newest first
+│       └── editions/YYYY-MM-DD.json  # one file per edition (source of truth)
 ├── src/timeleaf/
-│   ├── cli.py                   # `timeleaf fetch|edit|validate|build|serve`
-│   ├── models.py                # Pydantic: Sources, Candidates, Edition
+│   ├── cli.py                   # `timeleaf fetch|edit|validate|build|serve|canary|schema|reader`
+│   ├── models.py                # Pydantic: Reader, Sources, Candidates, Edition, Draft
+│   ├── readers.py               # load, check, scaffold and remove a reader's folder
+│   ├── blind.py                 # the "what it cannot see" paragraph, from a registry of sources
 │   ├── fetch/
 │   │   ├── http.py              # httpx client, retries, timeouts, health ledger
-│   │   ├── substack.py
+│   │   ├── substack.py          # profiles, posts, publication archives, likes and restacks
 │   │   └── lesswrong.py
 │   ├── edit/
-│   │   ├── prompt.md            # editor system prompt (versioned, reviewed like code)
-│   │   └── editor.py            # Claude API call, repair loop, cost accounting
-│   ├── validate.py              # editorial + provenance rules
+│   │   ├── prompt.md            # generic editor instructions (the values) with per-reader slots
+│   │   └── editor.py            # fills the slots, Claude API call, repair loop, cost accounting
+│   ├── validate.py              # editorial + provenance rules; each names the value it protects
 │   └── build/
 │       ├── render.py
 │       ├── templates/           # base, edition, archive, about, 404, feed.xml
 │       └── static/              # style.css, self-hosted fonts, favicon
 ├── tests/
-│   ├── fixtures/                # recorded API responses (trimmed), sample candidates
-│   ├── unit/
+│   ├── fixtures/                # recorded API responses (trimmed); readers/juniper, an invented reader
 │   └── golden/                  # snapshot of rendered edition 1
 ├── docs/                        # this plan, ADRs, runbook, PLAN-buzz
 ├── prototype/                   # frozen original scripts (reference only)
 ├── pyproject.toml  uv.lock  .pre-commit-config.yaml  .gitignore  README.md
 ```
+
+`readers/<id>/` holds personal data. While the repository is public, only the owner's folder is in it (DECISIONS review note 6). The public site is built from the primary reader's folder alone; a test checks that nothing of a second reader reaches it.
 
 `_site/` (build output) and `candidates*.json` are git-ignored. Candidates contain long excerpts of other people's posts, including paywalled ones; they are kept as 90-day workflow artifacts, never committed to a public repo.
 
@@ -145,39 +147,45 @@ Port of `prototype/fetch.py`, split by source, same behaviour. Endpoints are lis
 - Output is validated against the `Candidates` model before it is written.
 - Deterministic ordering (sort by date then URL) so diffs between runs are meaningful.
 - Fallback per publication: if the Substack API fails, try the public RSS feed (`<pub>/feed`).
+- `publications` in `sources.json` are read through each publication's own archive (`<url>/api/v1/archive?sort=new&limit=12`, then `posts/by-id`), so a source does not depend on what the reader's Substack account subscribes to. They are filtered and de-duplicated like subscriptions.
+- Roundup excerpts are long (20,000 characters) and keep each link next to its words, as `words [URL]`, so the editor can trace a story to its primary source.
 
-#### Edit (`timeleaf edit candidates.json -o content/editions/DATE.json`)
+#### Edit (`timeleaf edit candidates.json --reader <id>`, writes `readers/<id>/editions/DATE.json`)
 Replaces the manual "Claude reads candidates" step.
 
 - Model `claude-opus-5-5`, `output_config.effort: "high"`, streaming with `max_tokens: 64000`.
-- **Structured outputs**: `output_config.format` is the JSON schema of `Edition` (generated from the Pydantic model), so the response always parses.
+- **Structured outputs**: `output_config.format` is the JSON schema of `Draft` (generated from the Pydantic model), so the response always parses.
 - Refusal handling: beta `server-side-fallback-2026-07-01` with `fallbacks: "default"`; always check `stop_reason` before using output.
-- System prompt = `edit/prompt.md` (the product rules, section definitions, voice, and examples from edition 1). Stable, so it is cache-marked; the repair round-trip reuses the cache.
-- The model writes: selection, sections, kickers, titles, bodies, `why` lines, lede. The code writes: `number`, `date`, `range`, colophon facts.
+- System prompt = `edit/prompt.md` (generic: the values, the hard rules, voice) with three per-reader inserts: `profile.md`, `notes.md`, and the section table from `reader.json`. It is stable per reader, so it is cache-marked; the repair round-trip reuses the cache.
+- The model writes: selection, sections, kickers, titles, bodies, `why` lines, lede. The code writes: `number`, `date`, `range`, and the whole colophon, including "what it cannot see" (`blind.py`: a registry of known sources and whether this reader has them, plus the reader's own `blind_spots`).
 - **Repair loop**: if `validate` fails, send the list of violations back once. If it still fails, the workflow fails and opens an issue; nothing is half-published.
-- Log `usage` and cost; abort before the call if the estimated input (`count_tokens`) would exceed the per-run cap (default US$3).
+- Log `usage` and cost; abort before the call if the estimated input (`count_tokens`) would exceed the reader's cap (`max_cost_usd` in `reader.json`; US$2 by default, US$3 for *The Loop*).
 - Candidate content is **untrusted input** (prompt injection is possible inside any blog post). Mitigations: the model has no tools, output is schema-constrained, every URL must exist in candidates, and a human approves the PR.
 
 Estimated cost: ~60–120k input tokens + ~10–20k output (incl. thinking) ≈ **US$0.50–1.00 per edition**.
 
-#### Validate (`timeleaf validate content/editions/DATE.json --candidates candidates.json`)
-Pure functions, fully unit-tested. Runs in the weekly workflow and in CI on every PR that touches `content/`.
+#### Validate (`timeleaf validate [FILES] [--reader <id>] [--candidates candidates.json]`)
+Pure functions, fully unit-tested. Runs in the weekly workflow and in CI on every PR. With no arguments it checks every reader's editions, each against its own reader. In the code, each rule names the value in PRINCIPLES.md that it protects.
 
-| Rule | Severity |
-|---|---|
-| Parses against `Edition` schema | error |
-| Total items between 12 and 18 | error |
-| Every item has a non-empty `why` | error |
-| Every item URL and every `more[].url` appears in candidates (provenance) | error (in weekly run; skipped in CI when candidates absent) |
-| Every friend's `new_posts` URL appears in the edition | error |
-| Only `http(s)` URLs | error |
-| Essay items (`kind: essay`) have `mins` | error |
-| No duplicate URLs across items | error |
-| Body length ≤ 900 chars; essay body ≤ 400 chars | warning |
-| Buzz items have `seen` and ≥ 2 `more` links (from M4) | error |
+| Rule | Severity | Value |
+|---|---|---|
+| Parses against `Edition` schema | error | |
+| `item-cap`: total items between 12 and 18 | error | 1 |
+| `sections`: only the reader's own sections, in their order, with their titles and item kinds | error | US-12 |
+| `url`, `source`: every item links to and credits its original; only `http(s)` URLs | error | 11 |
+| `why`: every item has a non-empty `why` | error | 4 |
+| `essay-mins`: essay items have `mins` | error | 5 |
+| `provenance`: every item URL and every `more[].url` appears in candidates | error (with candidates) | 11, G3 |
+| `friends`: every new post by one of the reader's friends appears | error (with candidates) | 7 |
+| `source-cap`: at most 2 items link to the same site (host without `www.`). Friends' own posts and multi-author platforms (lesswrong.com, forum.effectivealtruism.org, substack.com itself, arxiv.org, x.com, twitter.com, youtube.com) are exempt | error (with candidates) | 3 |
+| `duplicate`: the same URL in two items | warning | 1 |
+| `body-length`: body ≤ 900 chars; essay body ≤ 400 chars | warning | 5 |
+| `buzz-seen`, `buzz-links`: Buzz items have `seen` and ≥ 2 `more` links (from M4) | error | 8 |
 
-#### Build (`timeleaf build -o _site`)
-Renders **all** editions from `content/editions/` every time (deterministic, idempotent, < 1 s).
+The rules marked "with candidates" apply at the moment an edition is created, so published editions never fail retroactively.
+
+#### Build (`timeleaf build -o _site [--reader <id>]`)
+Renders **all** editions of one reader from `readers/<id>/editions/` every time (deterministic, idempotent, < 1 s). Without `--reader` that is the primary reader, and the result is the public site, at the same URLs as before the per-reader layout. No other reader's folder is read. The paper's name comes from `reader.json`.
 
 Pages and files:
 - `/` — latest edition.
@@ -216,13 +224,49 @@ Template requirements:
 Defined in `src/timeleaf/models.py` (Pydantic v2). JSON Schemas are generated from the models and committed to `docs/schemas/` so they are reviewable. Every file has `schema_version`; bump it on breaking change and write a migration in `timeleaf migrate`.
 
 ```python
+class SectionSpec(BaseModel):
+    id: str  # slug, e.g. "front-page"
+    title: str
+    note: str
+    kind: Literal["news", "essay", "friend", "edge", "buzz"]  # what the section holds
+
+
+class Reader(BaseModel):  # readers/<id>/reader.json
+    schema_version: Literal[1] = 1
+    id: str  # same as the folder name
+    paper_name: str  # "The Loop"
+    email: str | None = None  # login address; not needed until the paper is behind a login
+    timezone: str = "Europe/Tallinn"
+    publish_day: str = "friday"
+    sections: list[SectionSpec]
+    review: Literal["pr", "auto"] = "pr"  # auto only for papers that are not public (value 10)
+    max_cost_usd: float = 2.0
+    blind_spots: list[str] = []  # what only this reader's paper cannot see
+
+
+class Publication(BaseModel):
+    name: str
+    url: HttpUrl  # read through <url>/api/v1/archive
+
+
+class Sources(BaseModel):  # readers/<id>/sources.json
+    schema_version: Literal[1] = 1
+    me: str | None = None  # Substack handle, optional
+    friends: list[Friend] = []  # every post appears
+    publications: list[Publication] = []
+    roundups: list[str] = []  # publication names: links count as votes, excerpts keep links
+    extra_seed_handles: list[str] = []
+    signal_handles: list[str] = []
+    lesswrong: bool = True
+
+
 class Link(BaseModel):
     label: str
     url: HttpUrl
 
 
 class Item(BaseModel):
-    kind: Literal["news", "essay", "friend", "edge", "buzz", "note"]  # note: a line with no link
+    kind: Literal["news", "essay", "friend", "edge", "buzz"]
     kicker: str  # e.g. "US politics"
     title: str
     url: HttpUrl
@@ -243,7 +287,7 @@ class Section(BaseModel):
 
 class Colophon(BaseModel):
     checked: str  # generated from health ledger
-    blind: str  # what this edition cannot see
+    blind: str  # what this edition cannot see; generated by blind.py, not by the model
     requests_ok: int
     requests_failed: list[str]
     model: str | None = None
@@ -259,6 +303,8 @@ class Edition(BaseModel):
     sections: list[Section]
     colophon: Colophon
 ```
+
+`Draft` is what the model returns: a `lede` and `sections`, nothing else. There is no `note` item kind: an edition never reports that friends were quiet (value 7).
 
 Migration of edition 1: add `schema_version`, section `id`s, item `kind`s and the numeric colophon fields. Do this by script in M1; keep the visible text identical.
 
@@ -297,8 +343,8 @@ Migration of edition 1: add `schema_version`, section `id`s, item `kind`s and th
 | Workflow | Trigger | Does |
 |---|---|---|
 | `ci.yml` | PR, push to main | `ruff check`, `ruff format --check`, `mypy --strict`, `pytest`, `timeleaf validate` on changed editions, `timeleaf build`, HTML validation (`html5validator`), link check on built site (internal links only) |
-| `weekly-edition.yml` | `cron: "0 5 * * 5"` (Fri 07:00 Tallinn) + `workflow_dispatch` with inputs `days`, `dry_run` | fetch → edit → validate → build preview → open PR with summary; on failure open/update an issue labelled `edition-failed` |
-| `deploy.yml` | push to `main` touching `content/`, `src/`, `config/` | build → deploy to Pages; `concurrency: pages` |
+| `weekly-edition.yml` | `cron: "0 5 * * 5"` (Fri 07:00 Tallinn) + `workflow_dispatch` with inputs `days`, `dry_run` | For each reader in `readers/` (a matrix; one failing does not stop the others): fetch → edit → validate. `review: "pr"`: build preview → open PR with summary. `review: "auto"`: commit the edition to `main`. On failure open/update an issue labelled `edition-failed` |
+| `deploy.yml` | push to `main` | check readers → validate → build the primary reader's paper → deploy to Pages; `concurrency: pages` |
 | `canary.yml` | daily | hits each source endpoint once, asserts response shape; opens an issue on 2 consecutive failures |
 
 The edition PR description contains: item count per section, the lede, validation warnings, request health, model, tokens and cost, and a link to the preview artifact. The reader can edit the JSON directly in the GitHub web editor before merging.
@@ -421,7 +467,7 @@ Implement exactly [PLAN-buzz.md](PLAN-buzz.md) §4 Stage 0 and §5: extract twee
 
 ### Later (not scheduled)
 - Buzz Stage 1–2 (needs answers to PLAN-buzz §8).
-- More sources outside Substack/LessWrong: Transformer, AI Safety Newsletter, EA Forum (RSS/GraphQL).
+- More sources outside Substack/LessWrong: EA Forum (it answered automated requests with a bot check on 2026-11-27), X. Transformer and the AI Safety Newsletter were added as publications (proposal 0001 P4).
 - Email delivery of each edition (RSS-to-email service, or Buttondown API).
 - "Revise" command: comment `/revise drop item 4, add X` on the edition PR to trigger a second editor pass.
 
@@ -461,10 +507,12 @@ Blocking items are marked ⛔ with the milestone they block.
 
 ## 10. Glossary
 
-- **Edition** — one week's newspaper; one JSON file in `content/editions/`.
+- **Reader** — a person with their own paper; one folder in `readers/`.
+- **Edition** — one week's newspaper for one reader; one JSON file in `readers/<id>/editions/`.
 - **Candidates** — everything fetched for one week, before selection.
 - **Seed** — a publication the reader subscribes to; its posts and links are candidates.
-- **Roundup** — a seed that summarises others (e.g. Zvi's *Don't Worry About the Vase*); its links count as votes.
+- **Publication** — a newsletter named in `sources.json` and read through its own archive, subscribed or not.
+- **Roundup** — a seed that summarises others (e.g. *Transformer*); its links count as votes. An index for finding stories, not where they should come from.
 - **Signal** — a trusted person whose likes and restacks surface items.
 - **Co-cited** — a URL linked by two or more independent sources in the window.
 - **Colophon** — the closing note on what was checked and what was not.

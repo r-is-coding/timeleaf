@@ -33,9 +33,11 @@ jobs:
         run: uv run mypy
       - name: Tests
         run: uv run pytest
-      - name: Validate editions
+      - name: Check reader folders
+        run: uv run timeleaf reader check
+      - name: Validate every reader's editions
         run: uv run timeleaf validate
-      - name: Build site
+      - name: Build the public site (the primary reader's paper only)
         run: uv run timeleaf build
       - name: Validate HTML
         run: uvx --from html5validator==0.4.2 html5validator --root _site --format text
