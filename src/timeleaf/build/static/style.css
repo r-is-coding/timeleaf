@@ -1,76 +1,180 @@
-/* The Loop. One reading column; section names sit in a left rail on wide screens and above items on phones.
-   Fonts are self-hosted (SIL OFL 1.1). Only the latin subset loads unless a page needs latin-ext. */
+/* Timeleaf, the "Edition" design. See docs/DESIGN.md for the idea, the tokens and the rules.
+   One reading column; newspaper rituals (masthead, dateline, index, section openers, an end) drawn with type and rules.
+   Fonts are self-hosted (SIL OFL 1.1): Fraunces (display, variable opsz + wght) and Source Serif 4 (text).
+   A browser only downloads the faces and subsets a page actually uses. */
 
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/fraunces-latin-opsz-wght.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/fraunces-latin-ext-opsz-wght.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-ext-400.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-400-italic.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-latin-ext-400-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:"Source Serif 4";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/source-serif-4-latin-600.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Source Serif 4";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/source-serif-4-latin-ext-600.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/bricolage-grotesque-latin-500.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/bricolage-grotesque-latin-ext-500.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/bricolage-grotesque-latin-700.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/bricolage-grotesque-latin-ext-700.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-ext-400.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-500.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-ext-500.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+/* Fallbacks sized to the web fonts' average character width, so text wraps the same before and after they load. */
+@font-face{font-family:"Timeleaf Text Fallback";font-style:normal;src:local("Georgia");size-adjust:107.5%}
+@font-face{font-family:"Timeleaf Text Fallback";font-style:italic;src:local("Georgia Italic");size-adjust:97%}
+@font-face{font-family:"Timeleaf Display Fallback";font-weight:100 900;src:local("Georgia");size-adjust:104%}
 
-:root{--bg:#f3f5f1;--surface:#e7ebe4;--fg:#18211c;--muted:#5b675f;--rule:#c9d1c8;--accent:#0b6b4f;--mark:#d7ead9;
---display:"Bricolage Grotesque",system-ui,sans-serif;--text:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#121815;--surface:#1b2420;--fg:#e6ece7;--muted:#9aa89f;--rule:#2e3a34;--accent:#6fd3a8;--mark:#1f3a2e;color-scheme:dark}
+/* Tokens. Day edition: ink on warm paper-white, one vermilion accent. */
+:root{
+--paper:#faf7f0;--wash:#f1ecdf;--ink:#17140f;--muted:#585146;--rule:#d8d0bf;--accent:#b92d14;
+--display:"Fraunces","Timeleaf Display Fallback",Georgia,serif;
+--text:"Source Serif 4","Timeleaf Text Fallback",Georgia,serif;
+--gutter:20px;--measure:32em;--rail:13rem;
+--s1:8px;--s2:16px;--s3:24px;--s4:40px;--s5:64px;--s6:104px;
+color-scheme:light}
+/* Night edition: its own palette (deep ink-blue, cream type, a warmer accent), not an inversion. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#10141f;--wash:#191f2e;--ink:#ece5d5;--muted:#a8a293;--rule:#333a4d;--accent:#ff8a6b;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#10141f;--wash:#191f2e;--ink:#ece5d5;--muted:#a8a293;--rule:#333a4d;--accent:#ff8a6b;color-scheme:dark}
 
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--text);font-size:18px;line-height:1.55;-webkit-text-size-adjust:100%}
-.wrap{max-width:880px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-a{color:inherit;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
-a:hover{color:var(--accent)}
-a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.skip{position:absolute;left:-9999px;top:8px;background:var(--fg);color:var(--bg);padding:8px 12px;z-index:10}
-.skip:focus{left:16px}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.55;overflow-wrap:break-word;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility}
+h1,h2,h3,p,ol,ul{margin:0}
+ol,ul{padding:0}
+.wrap{max-width:1120px;margin:0 auto;padding-block:0 var(--s5);padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+[id]{scroll-margin-top:var(--s2)}
 
-.topnav{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:28px}
-.topnav .brand{font-weight:500;color:var(--fg);text-decoration:none;letter-spacing:.04em;text-transform:uppercase}
+/* Links: underlined in running text; headlines carry no underline at rest and gain one, in the accent, on hover and focus. */
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:1px;text-underline-offset:.18em}
+a:hover{color:var(--accent);text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:1px}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--ink);color:var(--paper);padding:12px 16px;z-index:10;text-decoration:none}
+.skip:focus{left:var(--gutter)}
 
-.mast{padding-bottom:28px;border-bottom:3px solid var(--fg)}
-.issue,.kicker,.meta,.why,.sec p,.colophon{font-family:var(--mono);font-size:13px;line-height:1.5}
-.issue{color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em}
-h1{font-family:var(--display);font-weight:700;font-size:clamp(52px,12vw,104px);line-height:.9;letter-spacing:-.04em;margin:0}
-.lede{font-size:21px;line-height:1.45;max-width:34em;margin:20px 0 0}
+/* Labels: the small voice. Fraunces capitals, letterspaced. */
+.label,.topnav,.dateline,.kicker,.folio,.index h2,.index .m,.why b,.count,.colophon h2,.pager,.archive .no,.feedback label,.backlink{font-family:var(--display);font-weight:600;font-size:.875rem;line-height:1.3;letter-spacing:.08em;text-transform:uppercase;font-variant-numeric:lining-nums}
 
-section{display:grid;grid-template-columns:170px minmax(0,1fr);gap:0 32px;padding-top:28px;border-bottom:1px solid var(--rule)}
-.sec{grid-row:1 / span 20}
-.sec h2{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1;margin:0 0 6px;text-wrap:balance}
-.sec p{color:var(--muted);margin:0}
-.item{grid-column:2;min-width:0;padding-bottom:26px;max-width:36em}
-.kicker{color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin:0 0 4px;font-weight:500}
-h3{font-family:var(--display);font-weight:500;font-size:23px;line-height:1.2;margin:0;text-wrap:balance}
-.lead h3{font-size:clamp(28px,5vw,38px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
-.note h3{font-size:19px;color:var(--muted)}
-.meta{color:var(--muted);margin:6px 0 0}
-.body{margin:8px 0 0}
-.more{margin:8px 0 0;padding-left:1.1em;font-size:16px}
-.why{margin:10px 0 0;color:var(--muted)}
-.why span{background:var(--mark);color:var(--fg);padding:1px 6px;margin-right:4px}
+/* Top navigation */
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:var(--s2)}
+.topnav ul{display:flex;list-style:none;margin-right:-10px}
+.topnav a{display:inline-flex;align-items:center;min-height:48px;padding:0 10px;text-decoration:none;color:var(--muted)}
+.topnav a:hover,.topnav a[aria-current]{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.topnav .brand{padding-left:0;color:var(--ink)}
+/* Small phones: tighter tracking and padding so the site name and all three links fit on one line. */
+@media (max-width:400px){.topnav{gap:0}.topnav,.topnav a{letter-spacing:.03em}.topnav a{padding:0 6px}.topnav ul{margin-right:-6px}}
 
-.colophon{color:var(--muted);padding-top:28px;max-width:60em}
-.colophon p{margin:0 0 10px}
-.colophon strong{color:var(--fg);font-weight:500}
-.end{font-family:var(--display);font-size:22px;color:var(--fg);margin-bottom:18px}
-.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:16px;border-top:1px solid var(--rule)}
+/* Masthead: the paper's name as a poster, then the dateline between rules. */
+.mast{border-top:4px solid var(--ink)}
+.mast h1,.title{font-family:var(--display);font-weight:900;font-variation-settings:"opsz" 144;line-height:.86;letter-spacing:-.03em;text-wrap:balance;overflow-wrap:anywhere}
+.mast h1{font-size:min(22vw,260px);padding:.11em 0 .27em;margin-left:-.035em}
+.mast h1.mid{font-size:min(13vw,168px)}
+.mast h1.long{font-size:min(9.5vw,120px)}
+.dateline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px var(--s3);padding:11px 0 10px;border-top:1px solid var(--ink);border-bottom:4px double var(--ink)}
 
-.archive{list-style:none;margin:0;padding:0}
+/* Cover: the week in a sentence, the lead story, the index. */
+.lede{font-family:var(--display);font-weight:400;font-size:clamp(1.375rem,1rem + 1.6vw,2rem);line-height:1.25;max-width:26em;padding:var(--s4) 0;text-wrap:pretty}
+.lead{border-top:1px solid var(--ink);padding:var(--s3) 0 var(--s5)}
+.lead h2{font-family:var(--display);font-weight:650;font-size:clamp(2.25rem,1.2rem + 5.2vw,4.75rem);line-height:1;letter-spacing:-.02em;text-wrap:balance;margin:var(--s1) 0 var(--s3);max-width:15em}
+
+.index{border-top:4px solid var(--ink);padding-bottom:var(--s5)}
+.index-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px var(--s3);padding:12px 0;border-bottom:1px solid var(--ink)}
+.index h2{color:var(--accent)}
+.total{font-size:1rem;color:var(--muted)}
+.total b{font-weight:400;color:var(--ink)}
+.index-sec{break-inside:avoid;padding-top:var(--s3)}
+.index h3{font-family:var(--display);font-weight:650;font-size:1.375rem;line-height:1.15;padding-bottom:6px}
+.index ol{list-style:none;border-top:1px solid var(--rule)}
+.index li{border-bottom:1px solid var(--rule)}
+.index a{display:grid;grid-template-columns:2rem minmax(0,1fr) auto;gap:0 var(--s1);align-items:baseline;min-height:48px;padding:11px 0;text-decoration:none;font-size:1.0625rem;line-height:1.3}
+.index .n{font-family:var(--display);font-weight:600;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
+.index .t{text-wrap:pretty}
+.index .m{color:var(--muted);white-space:nowrap;padding-left:var(--s1);font-variant-numeric:lining-nums tabular-nums}
+.index a:hover{color:inherit}
+.index a:hover .t,.index a:focus-visible .t{color:var(--accent);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.18em}
+
+/* Section opener: a full-width rule, the name in large type, one line of note. */
+.opener{border-top:4px solid var(--ink);padding:var(--s2) 0 var(--s4);display:grid;gap:var(--s1) var(--s3);grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
+.opener h2{font-family:var(--display);font-weight:800;font-variation-settings:"opsz" 144;font-size:clamp(2.5rem,1.6rem + 4.6vw,4.5rem);line-height:.95;letter-spacing:-.025em;text-wrap:balance;grid-column:1 / -1}
+.opener .note{font-style:italic;font-size:1.1875rem;line-height:1.4;color:var(--ink)}
+.count{color:var(--muted);white-space:nowrap}
+.backlink{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);text-decoration:none}
+.backlink:hover{text-decoration:underline;text-decoration-thickness:2px}
+section{padding-bottom:var(--s4)}
+
+/* Item */
+.item{border-top:1px solid var(--rule);padding:var(--s2) 0 var(--s4)}
+.opener + .item,.lead{border-top-color:var(--ink)}
+.folio{color:var(--muted);padding-bottom:var(--s2)}
+.folio .num{display:none}
+.story{max-width:var(--measure)}
+.kicker{color:var(--accent)}
+.item h3{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,1.25rem + 1.1vw,1.9375rem);line-height:1.12;letter-spacing:-.01em;text-wrap:balance;margin-top:6px}
+.hl a{text-decoration:none}
+.hl a:hover,.hl a:focus-visible{color:var(--accent);text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.12em}
+/* A drawn north-east arrow marks a headline that leaves the paper (no glyph, so no font dependency). */
+.hl a::after{content:"";display:inline-block;width:.36em;height:.36em;margin-left:.28em;vertical-align:.32em;color:var(--accent);border-top:.075em solid;border-right:.075em solid;background:linear-gradient(to bottom right,transparent calc(50% - .04em),currentColor calc(50% - .04em),currentColor calc(50% + .04em),transparent calc(50% + .04em))}
+.lead h2 a::after{font-size:.55em;vertical-align:.7em}
+.meta{font-size:1rem;color:var(--muted);margin-top:var(--s1)}
+.body{margin-top:12px;text-wrap:pretty;hanging-punctuation:first}
+.more{list-style:none;margin-top:12px;font-size:1rem;display:flex;flex-wrap:wrap;gap:0 var(--s3)}
+.more a{display:inline-flex;align-items:center;min-height:44px}
+
+/* Why it is here: a different voice (italic), set off by an accent rule. On every item. */
+.why{margin-top:var(--s2);padding:2px 0 2px 14px;border-left:3px solid var(--accent);font-style:italic;font-size:1.0625rem;line-height:1.45;color:var(--muted)}
+.why b{display:block;font-style:normal;color:var(--accent);padding-bottom:3px}
+
+/* The end */
+.end{border-top:4px solid var(--ink);padding:var(--s5) 0 var(--s6);margin-top:var(--s3)}
+.end::before{content:"";display:block;width:.5em;height:.5em;border:.11em solid var(--accent);border-radius:50%;font-size:clamp(3rem,1.5rem + 8vw,7.5rem);margin-bottom:.22em}
+.end p{font-family:var(--display);font-weight:900;font-variation-settings:"opsz" 144;font-size:clamp(3rem,1.5rem + 8vw,7.5rem);line-height:.9;letter-spacing:-.03em;text-wrap:balance;max-width:8em}
+.colophon{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16em),1fr));gap:var(--s3) var(--s4);color:var(--muted);font-size:1rem;line-height:1.5}
+.colophon div{border-top:1px solid var(--ink);padding-top:12px}
+.colophon p{max-width:var(--measure)}
+.colophon h2{color:var(--ink);padding-bottom:var(--s1)}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 var(--s3);margin-top:var(--s4);border-top:1px solid var(--ink)}
+.pager a{display:inline-flex;align-items:center;min-height:48px;text-decoration:none}
+.pager a:hover{text-decoration:underline;text-decoration-thickness:2px}
+
+/* Inner pages: archive, about, 404 */
+.page-head{border-top:4px solid var(--ink);padding:var(--s2) 0 var(--s4)}
+.title{font-size:clamp(4rem,2rem + 13vw,11rem);padding:.08em 0 .12em;margin-left:-.035em}
+.page-head .lede{padding:var(--s2) 0 0}
+.archive{list-style:none;border-top:1px solid var(--ink)}
 .archive li{border-bottom:1px solid var(--rule)}
-.archive a{display:block;padding:18px 0;text-decoration:none}
-.archive .t{display:block;max-width:40em}
-.archive a:hover .t{text-decoration:underline;text-decoration-color:var(--accent)}
+.archive a{display:grid;grid-template-columns:minmax(0,1fr);gap:6px var(--s3);padding:var(--s3) 0;text-decoration:none}
+.archive .no{color:var(--muted)}
+.archive .no b{font-weight:inherit;color:var(--accent)}
+.archive .t{font-family:var(--display);font-weight:500;font-size:clamp(1.25rem,1.1rem + .8vw,1.625rem);line-height:1.2;max-width:28em;text-wrap:pretty}
+.archive a:hover{color:inherit}
+.archive a:hover .t,.archive a:focus-visible .t{color:var(--accent);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.15em}
 
-.prose{max-width:36em;padding-top:12px}
-.prose h2{font-family:var(--display);font-weight:700;font-size:24px;margin:32px 0 8px}
-.prose li{margin-bottom:6px}
-.feedback{display:grid;gap:8px;max-width:32em}
-.feedback label{font-family:var(--mono);font-size:13px;color:var(--muted)}
-.feedback textarea,.feedback input{font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--rule);padding:10px;width:100%}
-.feedback button{justify-self:start;font:500 14px var(--mono);background:var(--fg);color:var(--bg);border:0;padding:10px 16px;cursor:pointer}
+/* Long-form typography: the about page today, the reading room later. */
+.prose{max-width:var(--measure)}
+.prose > * + *{margin-top:1.1em}
+.prose h2{font-family:var(--display);font-weight:650;font-size:1.75rem;line-height:1.15;letter-spacing:-.01em;margin-top:2em;padding-top:12px;border-top:1px solid var(--ink)}
+.prose h3{font-family:var(--display);font-weight:650;font-size:1.3125rem;line-height:1.2;margin-top:1.8em}
+.prose h2 + *,.prose h3 + *{margin-top:.6em}
+.prose ol,.prose ul{padding-left:1.3em}
+.prose li + li{margin-top:.5em}
+.prose li::marker{color:var(--accent);font-family:var(--display);font-weight:600}
+.prose blockquote{margin-left:0;margin-right:0;padding-left:var(--s2);border-left:3px solid var(--accent);font-style:italic}
+.prose strong{font-weight:600}
+.prose img{max-width:100%;height:auto}
+.feedback{display:grid;gap:var(--s1)}
+.feedback label{color:var(--muted);margin-top:var(--s1)}
+.feedback textarea,.feedback input{font:inherit;color:var(--ink);background:var(--wash);border:1px solid var(--muted);border-radius:0;padding:12px;width:100%}
+.feedback button{justify-self:start;font-family:var(--display);font-weight:600;font-size:1rem;min-height:48px;background:var(--ink);color:var(--paper);border:0;border-radius:0;padding:0 var(--s3);margin-top:var(--s1);cursor:pointer}
+.feedback button:hover{background:var(--accent)}
 
-@media (max-width:640px){body{font-size:17px}section{grid-template-columns:minmax(0,1fr)}.sec{grid-row:auto;margin-bottom:18px}.item{grid-column:1}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Wide screens: more air, the index in two columns, item numbers in a left rail. */
+@media (min-width:720px){
+:root{--gutter:40px}
+body{font-size:1.25rem}
+.lede{padding:var(--s5) 0}
+.index-cols{columns:2;column-gap:var(--s5);column-rule:1px solid var(--rule)}
+.opener{padding-bottom:var(--s5)}
+.opener .note{font-size:1.375rem}
+.archive a{grid-template-columns:var(--rail) minmax(0,1fr);align-items:baseline}
+}
+@media (min-width:960px){
+.item,.lead-body{display:grid;grid-template-columns:var(--rail) minmax(0,var(--measure));gap:0 var(--s3)}
+.folio{padding:0}
+.folio span{display:block}
+.folio .sep{display:none}
+.folio .num{display:block;font-weight:300;font-variation-settings:"opsz" 144;font-size:4.5rem;line-height:.8;letter-spacing:-.04em;text-transform:none;color:var(--ink);padding-bottom:12px}
+.lead .folio .num{color:var(--accent)}
+.page-body{padding-left:calc(var(--rail) + var(--s3))}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}

@@ -21,6 +21,7 @@
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/atom+xml" title="{{ site.publication }}" href="/feed.xml">
+<link rel="preload" href="/static/fonts/fraunces-latin-opsz-wght.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/static/fonts/source-serif-4-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/style.css?v={{ v }}">
 </head>
@@ -29,7 +30,11 @@
 <div class="wrap">
 <nav class="topnav" aria-label="Site">
   <a href="/" class="brand">{{ site.site_name }}</a>
-  <span><a href="/archive/">Archive</a> · <a href="/about/">About</a> · <a href="/feed.xml">Feed</a></span>
+  <ul>
+    <li><a href="/archive/"{% if page_path == "/archive/" %} aria-current="page"{% endif %}>Archive</a></li>
+    <li><a href="/about/"{% if page_path == "/about/" %} aria-current="page"{% endif %}>About</a></li>
+    <li><a href="/feed.xml">Feed</a></li>
+  </ul>
 </nav>
 <main id="main">
 {% block main %}{% endblock %}

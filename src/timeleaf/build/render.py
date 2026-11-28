@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime as dt
 import hashlib
+import math
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,10 +16,11 @@ from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import escape
 from pydantic import BaseModel, ConfigDict
 
-from timeleaf.models import Edition
+from timeleaf.models import Edition, Item, Section
 
 STATIC = Path(__file__).parent / "static"
 MARKER = ".timeleaf-build"
+WORDS_PER_MINUTE = 230
 
 
 class SiteConfig(BaseModel):
@@ -64,6 +66,73 @@ def load_editions(directory: Path) -> list[Edition]:
     return eds
 
 
+@dataclass(frozen=True)
+class Entry:
+    """One item as the templates see it: numbered across the whole edition (docs/DESIGN.md)."""
+
+    item: Item
+    n: int  # 1-based position in the edition, for "4 of 17"
+    anchor: str  # element id the front-page index jumps to
+    mins: int | None  # reading time of the linked piece; None when unknown (never estimated)
+
+
+@dataclass(frozen=True)
+class Contents:
+    """What the front-page index needs: every non-empty section with its numbered items, and the totals."""
+
+    sections: list[tuple[Section, list[Entry]]]
+    count: int
+    paper_mins: int  # reading the edition itself, top to bottom
+    linked_mins: int  # what is behind the links: items that have both a url and a reading time
+
+    @property
+    def entries(self) -> list[Entry]:
+        return [x for _, xs in self.sections for x in xs]
+
+    @property
+    def lead(self) -> Entry | None:
+        """The first item of the edition, shown on the cover; None for an edition with no items."""
+        return self.sections[0][1][0] if self.sections else None
+
+    @property
+    def lead_section(self) -> Section | None:
+        return self.sections[0][0] if self.sections else None
+
+
+def _minutes(words: int) -> int:
+    return max(1, math.ceil(words / WORDS_PER_MINUTE))
+
+
+def _words(*texts: str | None) -> int:
+    return sum(len(t.split()) for t in texts if t)
+
+
+def contents(e: Edition) -> Contents:
+    sections: list[tuple[Section, list[Entry]]] = []
+    n = 0
+    words = _words(e.lede)
+    for s in e.sections:
+        if not s.items:  # an empty section has no opener, no index entry and no number
+            continue
+        entries = []
+        words += _words(s.title, s.note)
+        for i in s.items:
+            n += 1
+            words += _words(i.kicker, i.title, i.body, i.why)
+            entries.append(Entry(i, n, f"item-{n}", i.mins))
+        sections.append((s, entries))
+    linked = sum(x.mins for _, xs in sections for x in xs if x.item.url and x.mins)
+    return Contents(sections, n, _minutes(words), linked)
+
+
+def _duration(mins: int) -> str:
+    """'40 min' below an hour; above it, rounded to five minutes: '3 h 45 min'."""
+    if mins < 60:
+        return f"{mins} min"
+    hours, rest = divmod(5 * round(mins / 5), 60)
+    return f"{hours} h {rest} min" if rest else f"{hours} h"
+
+
 def _env() -> Environment:
     env = Environment(
         loader=PackageLoader("timeleaf.build", "templates"),
@@ -74,6 +143,8 @@ def _env() -> Environment:
         keep_trailing_newline=True,
     )
     env.filters["longdate"] = lambda d: f"{d.day} {d:%B %Y}"
+    env.filters["duration"] = _duration
+    env.globals["contents"] = contents
     return env
 
 

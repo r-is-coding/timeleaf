@@ -1,10 +1,12 @@
 {% extends "base.html.j2" %}
 {% block title %}About · {{ site.publication }}{% endblock %}
 {% block main %}
-<header class="mast">
-  <h1>About</h1>
+<header class="page-head">
+  <p class="label">{{ site.publication }}</p>
+  <h1 class="title">About</h1>
   <p class="lede">{{ site.publication }} is a weekly newspaper for one reader who left social media but still wants to know what the people they trust are reading and arguing about.</p>
 </header>
+<div class="page-body">
 <div class="prose">
 <h2>What it is</h2>
 <p>One edition a week, about fifteen items, and then it stops: <em>That is all for this week.</em> It covers AI safety and AI policy first, and rationalist, post-rationalist and contemplative writing second.</p>
@@ -32,5 +34,6 @@
 {% endif %}
 <h2>Privacy</h2>
 <p>This site sets no cookies, runs no scripts and loads nothing from other servers. Its fonts are served from this site.</p>
+</div>
 </div>
 {% endblock %}

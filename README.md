@@ -56,4 +56,4 @@ A reader's folder is private to that reader and the owner of Timeleaf. While thi
 - [docs/adr/](docs/adr/): architecture decisions.
 - [docs/PLAN-buzz.md](docs/PLAN-buzz.md): "The Buzz" section (Milestone 4).
 
-Fonts: Source Serif 4, Bricolage Grotesque and IBM Plex Mono, self-hosted under the SIL Open Font License 1.1.
+Fonts: Fraunces and Source Serif 4, self-hosted under the SIL Open Font License 1.1. The design is described in [docs/DESIGN.md](docs/DESIGN.md).
