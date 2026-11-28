@@ -1,4 +1,10 @@
-Google Inc.
+Fonts in this directory, as packaged by Fontsource (https://fontsource.org):
+
+Fraunces (@fontsource-variable/fraunces 5.3.0)
+Copyright 2020 The Fraunces Project Authors (https://github.com/undercasetype/Fraunces)
+
+Source Serif 4 (@fontsource/source-serif-4 5.3.1)
+Copyright Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'. Source is a trademark of Adobe.
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
