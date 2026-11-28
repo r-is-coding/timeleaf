@@ -123,4 +123,13 @@ Known limits: the fallback faces are matched against Georgia, so on devices with
 
 ## Screens
 
-Screenshots (front page, a section, the end, archive and about; day and night; desktop and phone) will be added under `docs/design/screens/` during review.
+Edition 1, rendered at review on 2026-11-28.
+
+| | |
+|---|---|
+| Front page, day | ![Front page, day](design/screens/desktop-front-day.png) |
+| Front page, night edition | ![Front page, night](design/screens/desktop-front-night.png) |
+| Items with numerals and why-lines | ![Items](design/screens/desktop-items-day.png) |
+| Phone (390 px), day | ![Phone](design/screens/phone-front-day.png) |
+| Archive | ![Archive](design/screens/desktop-archive-day.png) |
+| About | ![About](design/screens/desktop-about-day.png) |
