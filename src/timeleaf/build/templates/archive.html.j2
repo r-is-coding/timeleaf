@@ -1,13 +1,13 @@
 {% extends "base.html.j2" %}
 {% block title %}Archive · {{ site.publication }}{% endblock %}
 {% block main %}
-<header class="mast">
-  <p class="issue">{{ editions | length }} edition{{ "s" if editions | length != 1 else "" }}</p>
-  <h1>Archive</h1>
+<header class="page-head">
+  <p class="label">{{ site.publication }} · {{ editions | length }} edition{{ "s" if editions | length != 1 else "" }}</p>
+  <h1 class="title">Archive</h1>
 </header>
 <ol class="archive" reversed>
 {% for e in editions %}
-  <li><a href="{{ edition_path(e) }}"><span class="issue">No. {{ e.number }} · {{ e.range }}</span><span class="t">{{ e.lede }}</span></a></li>
+  <li><a href="{{ edition_path(e) }}"><span class="no"><b>No. {{ e.number }}</b> · {{ e.range }}</span> <span class="t">{{ e.lede }}</span></a></li>
 {% endfor %}
 </ol>
 {% endblock %}
