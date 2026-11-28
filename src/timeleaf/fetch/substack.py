@@ -17,12 +17,32 @@ _SPACE = re.compile(r"\s+")
 _HEADING = re.compile(r"<h[1-4][^>]*>(.*?)</h[1-4]>", re.S)
 _HREF = re.compile(r'href="(https?://[^"#?]+)')
 _SKIP_LINK = re.compile(r"substackcdn|/subscribe|twitter\.com/intent|\.(png|jpe?g|gif|webp)$", re.I)
+_ANCHOR = re.compile(r"<a\b([^>]*)>(.*?)</a>", re.S | re.I)
+_OPEN_LINK = re.compile(r"\s*\[https?://[^\]]*$")
 ACTIVITY_TYPES = {"post_like", "post_restack", "restack", "note"}
 
 
 def text(fragment: str | None, limit: int) -> str:
     t = html.unescape(_TAG.sub(" ", fragment or ""))
     return _SPACE.sub(" ", t).strip()[:limit]
+
+
+def text_with_links(fragment: str | None, limit: int) -> str:
+    """Like ``text``, but keeps each link next to its words: ``<a href="U">words</a>`` -> ``words [U]``.
+
+    Roundups are an index (PRINCIPLES value 3): the editor has to see which link belongs to which story.
+    URLs are written exactly as ``links`` returns them, and the junk links it skips are skipped here too.
+    """
+
+    def keep(m: re.Match[str]) -> str:
+        href = _HREF.search(m.group(1))
+        if not href or _SKIP_LINK.search(href.group(1)):
+            return m.group(2)
+        return f"{m.group(2)} [{href.group(1).rstrip('/')}]"
+
+    out = text(_ANCHOR.sub(keep, fragment or ""), limit)
+    # Never leave half a URL at the cut: the editor may only copy URLs, and a truncated one is wrong.
+    return _OPEN_LINK.sub("", out)
 
 
 def parse_when(s: str) -> dt.datetime:
@@ -38,7 +58,8 @@ def links(p: dict[str, Any]) -> list[str]:
     return sorted(out)
 
 
-def slim(p: dict[str, Any], limit: int = 1500) -> Post:
+def slim(p: dict[str, Any], limit: int = 1500, *, inline_links: bool = False) -> Post:
+    excerpt = text_with_links if inline_links else text
     return Post(
         title=p.get("title"),
         subtitle=p.get("subtitle"),
@@ -48,7 +69,7 @@ def slim(p: dict[str, Any], limit: int = 1500) -> Post:
         likes=p.get("reaction_count"),
         paywalled=p.get("audience") == "only_paid",
         authors=[b.get("name") for b in p.get("publishedBylines", []) if b.get("name")],
-        excerpt=text(p.get("body_html") or p.get("truncated_body_text") or p.get("description"), limit),
+        excerpt=excerpt(p.get("body_html") or p.get("truncated_body_text") or p.get("description"), limit),
     )
 
 
@@ -68,6 +89,15 @@ class Substack:
         j = self.http.json(f"{API}/profile/posts?profile_user_id={uid}&limit={limit}")
         posts = (j or {}).get("posts", []) if isinstance(j, dict) else []
         return [p for p in posts if isinstance(p, dict)]
+
+    def archive(self, base_url: str, limit: int = 12) -> list[dict[str, Any]]:
+        """A publication's newest posts, from its own host. No login and no subscription needed.
+
+        Some hosts answer ``{"posts": [...]}`` and others a bare list (checked 2026-11-27).
+        """
+        j = self.http.json(f"{base_url.rstrip('/')}/api/v1/archive?sort=new&limit={limit}")
+        posts = j.get("posts", []) if isinstance(j, dict) else j if isinstance(j, list) else []
+        return [p for p in posts if isinstance(p, dict) and p.get("id")]
 
     def full(self, p: dict[str, Any]) -> dict[str, Any]:
         """The posts list only carries a teaser; fetch the whole post."""

@@ -13,7 +13,7 @@
 <section aria-labelledby="s-{{ s.id }}">
   <header class="sec"><h2 id="s-{{ s.id }}">{{ s.title }}</h2><p>{{ s.note }}</p></header>
   {% for i in s.items %}
-  <article class="item{% if outer.first and loop.first %} lead{% endif %}{% if i.kind == 'note' %} note{% endif %}">
+  <article class="item{% if outer.first and loop.first %} lead{% endif %}">
     {% if i.kicker %}
     <p class="kicker">{{ i.kicker }}</p>
     {% endif %}
