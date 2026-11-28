@@ -1,6 +1,9 @@
 name: Weekly edition
 
-# Fetch -> Claude drafts -> validate -> open a PR. Merging the PR publishes the edition (deploy.yml).
+# For every reader in readers/: fetch -> Claude drafts -> validate -> hand over.
+#   review "pr":   open a pull request. Merging it publishes the edition (deploy.yml).
+#   review "auto": commit the edition straight to main. Only for papers that are not public
+#                  (docs/PRINCIPLES.md value 10); `timeleaf reader check` refuses it for the public paper.
 on:
   schedule:
     - cron: "0 5 * * 5" # Fridays 05:00 UTC (07:00 Tallinn in winter)
@@ -10,9 +13,12 @@ on:
         description: Window in days
         default: "7"
       dry_run:
-        description: Fetch and estimate the cost only; do not call the model or open a PR
+        description: Fetch and estimate the cost only; do not call the model, open a PR or commit
         type: boolean
         default: false
+      reader:
+        description: Only this reader id (default is every reader)
+        default: ""
 
 permissions:
   contents: read
@@ -22,10 +28,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  readers:
+    name: List readers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      readers: ${{ steps.list.outputs.readers }}
+    env:
+      ONLY: ${{ inputs.reader || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run timeleaf reader check
+      - id: list
+        run: |
+          all=$(uv run timeleaf reader list --json)
+          if [ -n "$ONLY" ]; then
+            all=$(jq -c --arg id "$ONLY" 'map(select(.id == $id))' <<< "$all")
+          fi
+          [ "$(jq length <<< "$all")" -gt 0 ] || { echo "no matching reader" >&2; exit 1; }
+          echo "readers=$all" >> "$GITHUB_OUTPUT"
+
   edition:
+    name: Edition (${{ matrix.reader.id }})
+    needs: readers
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: edition
+    strategy:
+      fail-fast: false # one reader's failure does not block another reader's paper
+      max-parallel: 2
+      matrix:
+        reader: ${{ fromJSON(needs.readers.outputs.readers) }}
     permissions:
       contents: write
       pull-requests: write
@@ -36,6 +75,10 @@ jobs:
       GH_TOKEN: ${{ secrets.EDITION_BOT_TOKEN || github.token }}
       DAYS: ${{ inputs.days || '7' }}
       DRY_RUN: ${{ inputs.dry_run || false }}
+      READER: ${{ matrix.reader.id }}
+      REVIEW: ${{ matrix.reader.review }}
+      PAPER: ${{ matrix.reader.paper_name }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -47,14 +90,16 @@ jobs:
 
       - name: Fetch candidates
         run: |
-          echo "DATE=$(date -u +%F)" >> "$GITHUB_ENV"
-          uv run timeleaf fetch -o candidates.json --days "$DAYS"
+          date=$(date -u +%F)
+          echo "DATE=$date" >> "$GITHUB_ENV"
+          echo "EDITION=readers/$READER/editions/$date.json" >> "$GITHUB_ENV"
+          uv run timeleaf fetch --reader "$READER" -o candidates.json --days "$DAYS"
 
       - name: Keep candidates (90 days, never committed)
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: candidates-${{ github.run_id }}
+          name: candidates-${{ matrix.reader.id }}-${{ github.run_id }}
           path: candidates.json
           retention-days: 90
           if-no-files-found: ignore
@@ -63,63 +108,81 @@ jobs:
         if: env.DRY_RUN == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: uv run timeleaf edit candidates.json --date "$DATE" --dry-run
+        run: uv run timeleaf edit candidates.json --reader "$READER" --date "$DATE" --dry-run
 
       - name: Draft edition with Claude
         if: env.DRY_RUN != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          uv run timeleaf edit candidates.json --date "$DATE" --report report.md
-          cat report.md >> "$GITHUB_STEP_SUMMARY"
+        run: uv run timeleaf edit candidates.json --reader "$READER" --date "$DATE" --report report.md
 
       - name: Validate (with provenance)
         if: env.DRY_RUN != 'true'
-        run: uv run timeleaf validate "content/editions/$DATE.json" --candidates candidates.json
+        run: uv run timeleaf validate "$EDITION" --reader "$READER" --candidates candidates.json
+
+      # --- review: pr. A person reads the edition before it is published.
+      - name: Run summary
+        if: env.DRY_RUN != 'true' && env.REVIEW == 'pr'
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build preview
-        if: env.DRY_RUN != 'true'
-        run: uv run timeleaf build
+        if: env.DRY_RUN != 'true' && env.REVIEW == 'pr'
+        run: uv run timeleaf build --reader "$READER"
 
       - name: Upload preview
-        if: env.DRY_RUN != 'true'
+        if: env.DRY_RUN != 'true' && env.REVIEW == 'pr'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: preview-${{ env.DATE }}
+          name: preview-${{ matrix.reader.id }}-${{ env.DATE }}
           path: _site
           retention-days: 30
 
       - name: Open pull request
-        if: env.DRY_RUN != 'true'
-        env:
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        if: env.DRY_RUN != 'true' && env.REVIEW == 'pr'
         run: |
-          branch="edition/$DATE"
-          number=$(jq -r .number "content/editions/$DATE.json")
+          branch="edition/$READER-$DATE"
+          number=$(jq -r .number "$EDITION")
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add "content/editions/$DATE.json"
-          git commit -m "content: edition $number ($DATE)"
+          git add "$EDITION"
+          git commit -m "content($READER): edition $number ($DATE)"
           git push --force origin "$branch"
           {
             cat report.md
             echo
-            echo "Preview: download \`preview-$DATE\` from [this run]($RUN_URL), unzip, and open it with"
-            echo "\`uv run timeleaf serve -d <folder>\`, or run \`uv run timeleaf build && uv run timeleaf serve\` on this branch."
+            echo "Preview: download \`preview-$READER-$DATE\` from [this run]($RUN_URL), unzip, and open it with"
+            echo "\`uv run timeleaf serve -d <folder>\`, or run \`uv run timeleaf build --reader $READER && uv run timeleaf serve\` on this branch."
           } > pr-body.md
           gh label create edition --color 0b6b4f --force > /dev/null
-          gh pr create --base main --head "$branch" --title "Edition $number · $DATE" \
+          gh pr create --base main --head "$branch" --title "$PAPER · Edition $number · $DATE" \
             --body-file pr-body.md --label edition
+
+      # --- review: auto. A private paper goes straight to its one reader after the automatic checks.
+      # The edition's text is not written to the run summary or to a preview artifact.
+      - name: Commit edition to main
+        if: env.DRY_RUN != 'true' && env.REVIEW == 'auto'
+        run: |
+          number=$(jq -r .number "$EDITION")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$EDITION"
+          git commit -m "content($READER): edition $number ($DATE)"
+          pushed=false
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then pushed=true; break; fi
+            echo "push $attempt was rejected; rebasing on main"
+            git pull --rebase origin main
+          done
+          [ "$pushed" = true ]
+          echo "Edition $number of reader \`$READER\` was committed to main." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Report failure
         if: failure()
-        env:
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           gh label create edition-failed --color b60205 --force > /dev/null
           existing=$(gh issue list --label edition-failed --state open --json number --jq '.[0].number')
-          msg="The weekly edition run failed on $(date -u +%F): $RUN_URL"
+          msg="The weekly edition run for reader \`$READER\` failed on $(date -u +%F): $RUN_URL"
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$msg"
           else

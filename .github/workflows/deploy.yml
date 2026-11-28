@@ -24,6 +24,7 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --locked
+      - run: uv run timeleaf reader check
       - run: uv run timeleaf validate
       - run: uv run timeleaf build && rm -f _site/.timeleaf-build
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
