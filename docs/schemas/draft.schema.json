@@ -9,8 +9,7 @@
             "essay",
             "friend",
             "edge",
-            "buzz",
-            "note"
+            "buzz"
           ],
           "title": "Kind",
           "type": "string"
@@ -170,17 +169,11 @@
       },
       "title": "Sections",
       "type": "array"
-    },
-    "blind": {
-      "description": "One short paragraph: what this edition cannot see.",
-      "title": "Blind",
-      "type": "string"
     }
   },
   "required": [
     "lede",
-    "sections",
-    "blind"
+    "sections"
   ],
   "title": "Draft",
   "type": "object"

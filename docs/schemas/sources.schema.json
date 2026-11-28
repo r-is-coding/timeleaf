@@ -28,6 +28,27 @@
       ],
       "title": "Friend",
       "type": "object"
+    },
+    "Publication": {
+      "additionalProperties": false,
+      "description": "A Substack publication read through its own archive, whether or not the reader subscribes to it.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "url": {
+          "description": "The publication's home, e.g. https://newsletter.example",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "url"
+      ],
+      "title": "Publication",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -39,9 +60,17 @@
       "type": "integer"
     },
     "me": {
-      "description": "The reader's Substack handle; their subscriptions are the seeds.",
-      "title": "Me",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The reader's Substack handle, if they have one; their subscriptions are seeds.",
+      "title": "Me"
     },
     "friends": {
       "items": {
@@ -50,8 +79,16 @@
       "title": "Friends",
       "type": "array"
     },
+    "publications": {
+      "description": "Publications fetched directly, like seeds",
+      "items": {
+        "$ref": "#/$defs/Publication"
+      },
+      "title": "Publications",
+      "type": "array"
+    },
     "roundups": {
-      "description": "Publication names whose links count as votes",
+      "description": "Names of publications whose links count as votes and whose excerpts keep their links",
       "items": {
         "type": "string"
       },
@@ -71,12 +108,14 @@
       },
       "title": "Signal Handles",
       "type": "array"
+    },
+    "lesswrong": {
+      "default": true,
+      "description": "Read the week's top LessWrong posts",
+      "title": "Lesswrong",
+      "type": "boolean"
     }
   },
-  "required": [
-    "me",
-    "friends"
-  ],
   "title": "Sources",
   "type": "object"
 }
