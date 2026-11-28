@@ -467,7 +467,7 @@ Implement exactly [PLAN-buzz.md](PLAN-buzz.md) §4 Stage 0 and §5: extract twee
 
 ### Later (not scheduled)
 - Buzz Stage 1–2 (needs answers to PLAN-buzz §8).
-- More sources outside Substack/LessWrong: Transformer, AI Safety Newsletter, EA Forum (RSS/GraphQL).
+- More sources outside Substack/LessWrong: EA Forum (it answered automated requests with a bot check on 2026-11-27), X. Transformer and the AI Safety Newsletter were added as publications (proposal 0001 P4).
 - Email delivery of each edition (RSS-to-email service, or Buttondown API).
 - "Revise" command: comment `/revise drop item 4, add X` on the edition PR to trigger a second editor pass.
 
