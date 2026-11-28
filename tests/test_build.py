@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import ROOT
-from timeleaf.build.render import MARKER, SiteConfig, build, load_editions
+from timeleaf.build.render import MARKER, SiteConfig, _duration, build, contents, load_editions
 from timeleaf.models import Edition
 
 GOLDEN = Path(__file__).parent / "golden" / "edition-2026-11-27.html"
@@ -59,6 +59,8 @@ def test_pages_exist(built: Path) -> None:
         "static/style.css",
         "static/favicon.svg",
         "static/fonts/source-serif-4-latin-400.woff2",
+        "static/fonts/fraunces-latin-opsz-wght.woff2",
+        "static/fonts/LICENSE-OFL.txt",
         MARKER,
     ]:
         assert (built / f).is_file(), f
@@ -79,7 +81,8 @@ def test_internal_links_resolve(built: Path) -> None:
 def test_css_font_urls_resolve(built: Path) -> None:
     css = (built / "static/style.css").read_text(encoding="utf-8")
     fonts = re.findall(r"url\((fonts/[^)]+)\)", css)
-    assert len(fonts) == 12
+    assert len(fonts) == 8
+    assert not re.search(r"mono", css, re.I)  # docs/DESIGN.md: no monospace
     for f in fonts:
         assert (built / "static" / f).is_file(), f
 
@@ -100,7 +103,86 @@ def test_head_has_csp_canonical_and_lang(built: Path) -> None:
     assert '<html lang="en">' in html
     assert "Content-Security-Policy" in html and "script-src 'none'" in html
     assert '<link rel="canonical" href="https://timeleaf.ee/editions/2026-11-27/">' in html
-    assert html.count("<h1>") == 1
+    assert html.count("<h1") == 1
+
+
+def test_every_shipped_font_is_used(built: Path) -> None:
+    css = (built / "static/style.css").read_text(encoding="utf-8")
+    for f in (built / "static/fonts").glob("*.woff2"):
+        assert f"fonts/{f.name}" in css, f"{f.name} is shipped but never referenced"
+
+
+def test_contents_numbers_items_across_the_edition(edition1: Edition) -> None:
+    c = contents(edition1)
+    assert c.count == edition1.item_count == len(c.entries)
+    assert [x.n for x in c.entries] == list(range(1, c.count + 1))
+    assert [x.anchor for x in c.entries] == [f"item-{n}" for n in range(1, c.count + 1)]
+    assert [s.id for s, _ in c.sections] == [s.id for s in edition1.sections]
+    assert [x.item for x in c.entries] == edition1.items
+
+
+def test_contents_reading_times(edition1: Edition) -> None:
+    c = contents(edition1)
+    for x in c.entries:
+        if x.item.mins:
+            assert x.mins == x.item.mins
+        else:  # estimated from the body at 230 words a minute, never zero
+            assert x.mins == max(1, -(-len(x.item.body.split()) // 230))
+    assert c.linked_mins == sum(x.mins for x in c.entries)
+    assert 1 <= c.paper_mins < c.linked_mins
+    long = edition1.model_copy(deep=True)
+    long.sections[0].items[0].mins = None
+    long.sections[0].items[0].body = "word " * 700
+    assert contents(long).entries[0].mins == 4
+    assert contents(long).paper_mins > c.paper_mins
+
+
+def test_duration_filter() -> None:
+    assert _duration(40) == "40 min"
+    assert _duration(60) == "1 h"
+    assert _duration(223) == "3 h 45 min"
+
+
+def test_edition_has_index_totals_and_orientation(built: Path, edition1: Edition) -> None:
+    html = (built / "index.html").read_text(encoding="utf-8")
+    c = contents(edition1)
+    assert '<nav class="index" id="index" aria-labelledby="index-h">' in html
+    assert f"<b>{c.count} items</b>" in html and f"<b>{c.paper_mins} min</b>" in html
+    for x in c.entries:
+        assert html.count(f'id="{x.anchor}"') == 1
+        assert html.count(f'href="#{x.anchor}"') == 1
+        assert f"{x.n} of {c.count}</span>" in html
+    assert html.count("Why it is here") == sum(1 for i in edition1.items if i.why)
+    assert "That is all for this week." in html
+
+
+def test_fragment_links_resolve(built: Path) -> None:
+    for page in built.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        ids = re.findall(r'\sid="([^"]+)"', html)
+        assert len(ids) == len(set(ids)), f"duplicate ids in {page.relative_to(built)}"
+        for ref in refs(page):
+            if ref.startswith("#"):
+                assert ref[1:] in ids, f"{page.relative_to(built)} jumps to missing {ref}"
+
+
+def test_no_inline_styles(built: Path) -> None:
+    """The CSP allows style-src 'self' only."""
+    for page in built.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        assert "<style" not in html and " style=" not in html
+
+
+def test_edition_with_a_single_item_renders(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = edition1.model_copy(deep=True)
+    e.sections = e.sections[:1]
+    e.sections[0].items = e.sections[0].items[:1]
+    (tmp_path / "ed").mkdir()
+    (tmp_path / "ed/2026-11-27.json").write_text(e.model_dump_json(), encoding="utf-8")
+    build(tmp_path / "ed", tmp_path / "out", site)
+    html = (tmp_path / "out/index.html").read_text(encoding="utf-8")
+    assert "<b>1 item</b>" in html and 'id="item-1"' in html
+    assert html.count("<h1") == 1
 
 
 def test_model_text_is_escaped(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:

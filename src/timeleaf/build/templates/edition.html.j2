@@ -28,7 +28,7 @@
     </div>
 {% endmacro %}
 {% macro folio(x, s, c) %}
-<p class="folio"><span class="num" aria-hidden="true">{{ x.n }}</span> {{ s.title }} · {{ x.n }} of {{ c.count }}</p>
+<p class="folio"><span class="num" aria-hidden="true">{{ x.n }}</span> <span>{{ s.title }}</span><span class="sep"> · </span><span>{{ x.n }} of {{ c.count }}</span></p>
 {% endmacro %}
 {% block main %}
 {% set c = contents(e) %}
@@ -96,9 +96,9 @@
   {% endif %}
 </div>
 <nav class="pager" aria-label="Editions">
-  {% if prev %}<a href="{{ edition_path(prev) }}" rel="prev">Previous · No. {{ prev.number }}</a>{% else %}<span></span>{% endif %}
+  {% if prev %}<a href="{{ edition_path(prev) }}" rel="prev">Previous · No. {{ prev.number }}</a>{% endif %}
   <a href="#index">Index</a>
   <a href="/archive/">All editions</a>
-  {% if next %}<a href="{{ edition_path(next) }}" rel="next">Next · No. {{ next.number }}</a>{% else %}<span></span>{% endif %}
+  {% if next %}<a href="{{ edition_path(next) }}" rel="next">Next · No. {{ next.number }}</a>{% endif %}
 </nav>
 {% endblock %}
