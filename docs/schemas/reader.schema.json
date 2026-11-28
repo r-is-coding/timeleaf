@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "SectionSpec": {
+      "additionalProperties": false,
+      "description": "One section of a reader's paper. The editor uses these ids, titles and notes exactly.",
+      "properties": {
+        "id": {
+          "maxLength": 40,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "kind": {
+          "description": "The kind of item this section holds",
+          "enum": [
+            "news",
+            "essay",
+            "friend",
+            "edge",
+            "buzz"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "note",
+        "kind"
+      ],
+      "title": "SectionSpec",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "``readers/<id>/reader.json``: one reader and the shape of their paper.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "id": {
+      "description": "Same as the folder name",
+      "maxLength": 40,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "paper_name": {
+      "minLength": 1,
+      "title": "Paper Name",
+      "type": "string"
+    },
+    "email": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The address the reader will log in with",
+      "title": "Email"
+    },
+    "timezone": {
+      "default": "Europe/Tallinn",
+      "title": "Timezone",
+      "type": "string"
+    },
+    "publish_day": {
+      "default": "friday",
+      "enum": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ],
+      "title": "Publish Day",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/SectionSpec"
+      },
+      "minItems": 1,
+      "title": "Sections",
+      "type": "array"
+    },
+    "review": {
+      "default": "pr",
+      "description": "pr: a person approves each edition in a pull request. auto: the edition goes straight to its one reader after the automatic checks (only for papers that are not public).",
+      "enum": [
+        "pr",
+        "auto"
+      ],
+      "title": "Review",
+      "type": "string"
+    },
+    "max_cost_usd": {
+      "default": 2.0,
+      "description": "Cap on the model cost of one edition",
+      "exclusiveMinimum": 0,
+      "title": "Max Cost Usd",
+      "type": "number"
+    },
+    "blind_spots": {
+      "description": "Things this reader's paper cannot see, beyond the ones the code knows about, each phrased to follow 'This edition cannot see ...'",
+      "items": {
+        "type": "string"
+      },
+      "title": "Blind Spots",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "paper_name",
+    "sections"
+  ],
+  "title": "Reader",
+  "type": "object"
+}

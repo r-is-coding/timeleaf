@@ -4,10 +4,12 @@
       "additionalProperties": false,
       "properties": {
         "checked": {
+          "description": "Written by code from the request ledger",
           "title": "Checked",
           "type": "string"
         },
         "blind": {
+          "description": "What the edition cannot see. Written by code (timeleaf.blind)",
           "title": "Blind",
           "type": "string"
         },
@@ -64,8 +66,7 @@
             "essay",
             "friend",
             "edge",
-            "buzz",
-            "note"
+            "buzz"
           ],
           "title": "Kind",
           "type": "string"

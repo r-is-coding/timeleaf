@@ -5,7 +5,11 @@
     {"name": "Ana", "handle": "ana", "recommendations": true, "rec_days": 30},
     {"name": "Ben", "handle": "ben"}
   ],
-  "roundups": ["Roundup Weekly"],
+  "publications": [
+    {"name": "Field Notes", "url": "https://fieldnotes.example/"},
+    {"name": "Garden Digest", "url": "https://digest.example"}
+  ],
+  "roundups": ["Roundup Weekly", "Field Notes"],
   "extra_seed_handles": [],
   "signal_handles": ["ana"]
 }

@@ -1,7 +1,7 @@
 [project]
 name = "timeleaf"
 version = "0.1.0"
-description = "The Loop: a finite weekly newspaper, built and published at timeleaf.ee"
+description = "Timeleaf: a finite weekly paper for each reader, built and published at timeleaf.ee"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

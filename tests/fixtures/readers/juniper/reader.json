@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "juniper",
+  "paper_name": "The Kettle",
+  "email": "juniper@example.org",
+  "timezone": "Europe/Lisbon",
+  "publish_day": "sunday",
+  "sections": [
+    {"id": "headlines", "title": "Headlines", "note": "What happened in the gardens.", "kind": "news"},
+    {"id": "long-reads", "title": "Long reads", "note": "For the armchair.", "kind": "essay"},
+    {"id": "friends", "title": "From the allotment", "note": "Everything your friends post.", "kind": "friend"},
+    {"id": "edges", "title": "Over the hedge", "note": "What the neighbours were reading.", "kind": "edge"}
+  ],
+  "review": "auto",
+  "max_cost_usd": 2.0,
+  "blind_spots": ["the allotment society's mailing list"]
+}

@@ -3,7 +3,7 @@
  "number": 1,
  "date": "2026-11-27",
  "range": "20–27 November 2026",
- "lede": "A loud week. A machine-checked proof of the Riemann Hypothesis, a president reinstating a chip CEO, and the biggest AI protests so far. Your three friends posted nothing new.",
+ "lede": "A loud week. A machine-checked proof of the Riemann Hypothesis, a president reinstating a chip CEO, and the biggest AI protests so far.",
  "sections": [
   {
    "id": "front-page",
@@ -235,18 +235,6 @@
      "why": "Liked by Gamithra · AI seen from far outside your usual circle",
      "more": [],
      "seen": null
-    },
-    {
-     "kind": "note",
-     "kicker": "No new posts",
-     "title": "Gamithra, Llela and Sese did not publish this week",
-     "url": null,
-     "source": null,
-     "mins": null,
-     "body": "Their latest remain: Gamithra, \"setting up the London School of Relational Technologies\" (27 May). Llela, \"What I thought today\" (31 August). Sese, \"Two poems\" (August 2025).",
-     "why": null,
-     "more": [],
-     "seen": null
     }
    ]
   },
@@ -283,7 +271,7 @@
   }
  ],
  "colophon": {
-  "checked": "45 requests to Substack and LessWrong, none failed. 9 posts from your subscriptions, 25 top LessWrong posts and 7 likes or restacks from your circle were read; 18 items made the edition.",
+  "checked": "45 requests to Substack and LessWrong, none failed. 9 posts from your subscriptions, 25 top LessWrong posts and 7 likes or restacks from your circle were read; 17 items made the edition.",
   "blind": "This edition cannot see X, PauseAI's internal channels, or sites other than Substack and LessWrong (so no Transformer, AI Safety Newsletter or EA Forum yet). News items are reported as the linked authors describe them and were not checked against primary sources.",
   "requests_ok": 45,
   "requests_failed": [],

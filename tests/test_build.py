@@ -10,11 +10,89 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import ROOT
+from tests.conftest import EDITION1, READERS, ROOT
 from timeleaf.build.render import MARKER, SiteConfig, build, load_editions
-from timeleaf.models import Edition
+from timeleaf.models import Candidates, Edition
 
+EDITIONS = READERS / "richard/editions"
 GOLDEN = Path(__file__).parent / "golden" / "edition-2026-11-27.html"
+
+
+def test_paper_name_comes_from_the_reader_not_site_json(tmp_path: Path, site: SiteConfig) -> None:
+    assert "publication" not in SiteConfig.model_fields
+    with pytest.raises(ValueError, match="publication"):
+        SiteConfig.model_validate({**site.model_dump(), "publication": "The Loop"})
+    build(EDITIONS, tmp_path / "o", site, paper_name="The Kettle")
+    html = (tmp_path / "o/index.html").read_text(encoding="utf-8")
+    assert "<h1>The Kettle</h1>" in html and "The Loop" not in html
+
+
+def test_no_edition_mentions_quiet_friends(built: Path) -> None:
+    """Value 7: silence is not news."""
+    for page in [*built.rglob("*.html"), built / "feed.xml"]:
+        text = page.read_text(encoding="utf-8")
+        assert "did not publish" not in text and "posted nothing" not in text
+        assert 'class="item note"' not in text
+
+
+def test_another_readers_data_never_reaches_the_public_build(
+    two_readers: Path, tmp_path: Path, candidates: Candidates
+) -> None:
+    """Value 12: private by default. The public site is the primary reader's paper and nothing else."""
+    from typer.testing import CliRunner
+
+    from tests.test_editor import DATE, FakeModel, good_draft, reply
+    from timeleaf import readers as rd
+    from timeleaf.cli import app
+    from timeleaf.edit.editor import edit
+
+    # Give the second reader a real edition of their own, so there is something that could leak.
+    juniper = rd.load(two_readers, "juniper")
+    theirs, _ = edit(candidates, juniper, None, DATE, FakeModel(reply(good_draft())))
+    juniper.editions.mkdir(exist_ok=True)
+    (juniper.editions / "2026-11-27.json").write_text(theirs.model_dump_json(), encoding="utf-8")
+
+    out = tmp_path / "public"
+    args = ["--readers", str(two_readers), "--site", str(ROOT / "config/site.json")]
+    r = CliRunner().invoke(app, ["build", "-o", str(out), *args])
+    assert r.exit_code == 0, r.output
+    assert "The Loop" in r.output
+
+    secrets = {
+        juniper.id,
+        juniper.reader.paper_name,
+        juniper.reader.email or "",
+        *juniper.reader.blind_spots,
+        *(s.id for s in juniper.reader.sections if s.id not in {"friends", "edges"}),
+        *(s.title for s in juniper.reader.sections),
+        *(s.note for s in juniper.reader.sections),
+        *(f"{f.handle}.substack.com" for f in juniper.sources.friends),
+        *(f"@{f.handle}" for f in juniper.sources.friends),
+        *(p.name for p in juniper.sources.publications),
+        *(p.url.rstrip("/") for p in juniper.sources.publications),
+        *juniper.sources.roundups,
+        *(i.title for i in theirs.items),
+        *(i.url or "" for i in theirs.items),
+        "market garden",
+        "polytunnels",
+    }
+    secrets.discard("")
+    assert len(secrets) > 40
+    files = [p for p in out.rglob("*") if p.is_file() and p.suffix != ".woff2"]
+    assert len(files) > 8
+    for f in files:
+        text = f.read_text(encoding="utf-8").lower()
+        for s in secrets:
+            assert s.lower() not in text, f"{s!r} from another reader is in {f.relative_to(out)}"
+        assert str(f.relative_to(out)).lower().find("juniper") == -1
+    # and nothing under a per-reader path exists either: the URLs are exactly today's
+    assert not (out / "juniper").exists() and not (out / "richard").exists()
+
+    # The other way round works too: their paper can be built on its own, for them only.
+    r = CliRunner().invoke(app, ["build", "-o", str(tmp_path / "theirs"), "--reader", "juniper", *args])
+    assert r.exit_code == 0, r.output
+    page = (tmp_path / "theirs/index.html").read_text(encoding="utf-8")
+    assert "<h1>The Kettle</h1>" in page and "The Loop" not in page and "PauseAI" not in page
 
 
 @pytest.fixture
@@ -25,7 +103,7 @@ def site() -> SiteConfig:
 @pytest.fixture
 def built(tmp_path: Path, site: SiteConfig) -> Path:
     out = tmp_path / "_site"
-    build(ROOT / "content/editions", out, site)
+    build(EDITIONS, out, site, paper_name="The Loop")
     return out
 
 
@@ -109,7 +187,7 @@ def test_model_text_is_escaped(tmp_path: Path, site: SiteConfig, edition1: Editi
     e.sections[0].items[0].title = "<img src=x onerror=alert(1)>"
     (tmp_path / "ed").mkdir()
     (tmp_path / "ed/2026-11-27.json").write_text(e.model_dump_json(), encoding="utf-8")
-    build(tmp_path / "ed", tmp_path / "out", site)
+    build(tmp_path / "ed", tmp_path / "out", site, paper_name="The Loop")
     html = (tmp_path / "out/index.html").read_text(encoding="utf-8")
     assert "<script>alert" not in html and "&lt;script&gt;" in html
     assert "<img src=x" not in html
@@ -129,7 +207,7 @@ def test_feed_and_sitemap_are_valid_xml(built: Path) -> None:
 
 def test_noindex_option(tmp_path: Path, site: SiteConfig) -> None:
     quiet = site.model_copy(update={"indexable": False})
-    build(ROOT / "content/editions", tmp_path / "o", quiet)
+    build(EDITIONS, tmp_path / "o", quiet, paper_name="The Loop")
     assert "noindex" in (tmp_path / "o/index.html").read_text(encoding="utf-8")
     assert "Disallow: /" in (tmp_path / "o/robots.txt").read_text(encoding="utf-8")
 
@@ -137,10 +215,10 @@ def test_noindex_option(tmp_path: Path, site: SiteConfig) -> None:
 def test_multiple_editions_link_to_each_other(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
     ed = tmp_path / "ed"
     ed.mkdir()
-    shutil.copy(ROOT / "content/editions/2026-11-27.json", ed)
+    shutil.copy(EDITION1, ed)
     e2 = edition1.model_copy(update={"number": 2, "date": dt.date(2026, 12, 4)})
     (ed / "2026-12-04.json").write_text(e2.model_dump_json(), encoding="utf-8")
-    build(ed, tmp_path / "o", site)
+    build(ed, tmp_path / "o", site, paper_name="The Loop")
     first = (tmp_path / "o/editions/2026-11-27/index.html").read_text(encoding="utf-8")
     assert 'href="/editions/2026-12-04/" rel="next"' in first
     index = (tmp_path / "o/index.html").read_text(encoding="utf-8")
@@ -160,13 +238,13 @@ def test_refuses_to_clear_foreign_directory(tmp_path: Path, site: SiteConfig) ->
     out.mkdir()
     (out / "keep.txt").write_text("x", encoding="utf-8")
     with pytest.raises(FileExistsError):
-        build(ROOT / "content/editions", out, site)
+        build(EDITIONS, out, site, paper_name="The Loop")
     assert (out / "keep.txt").exists()
 
 
 def test_build_is_idempotent(built: Path, site: SiteConfig) -> None:
     before = (built / "index.html").read_bytes()
-    build(ROOT / "content/editions", built, site)
+    build(EDITIONS, built, site, paper_name="The Loop")
     assert (built / "index.html").read_bytes() == before
 
 
