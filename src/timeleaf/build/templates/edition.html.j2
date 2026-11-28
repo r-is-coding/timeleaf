@@ -32,43 +32,45 @@
 {% endmacro %}
 {% block main %}
 {% set c = contents(e) %}
-{% set lead = c.entries[0] %}
+{% set lead = c.lead %}
 {% set name = site.publication | length %}
 <header class="mast">
   <h1{% if name > 16 %} class="long"{% elif name > 9 %} class="mid"{% endif %}>{{ site.publication }}</h1>
   <p class="dateline"><span class="no">No. {{ e.number }}</span> <span>{{ e.date.strftime("%A") }} {{ e.date | longdate }}</span> <span>The week of {{ e.range }}</span></p>
 </header>
 <p class="lede">{{ e.lede }}</p>
+{% if lead %}
 <article class="lead" id="{{ lead.anchor }}">
   {% if lead.item.kicker %}
   <p class="kicker">{{ lead.item.kicker }}</p>
   {% endif %}
   <h2 class="hl">{% if lead.item.url %}<a href="{{ lead.item.url }}">{{ lead.item.title }}</a>{% else %}{{ lead.item.title }}{% endif %}</h2>
   <div class="lead-body">
-    {{ folio(lead, c.sections[0][0], c) }}
+    {{ folio(lead, c.lead_section, c) }}
 {{ story(lead, 2) }}
   </div>
 </article>
 <nav class="index" id="index" aria-labelledby="index-h">
   <div class="index-head">
     <h2 id="index-h">In this edition</h2>
-    <p class="total"><b>{{ c.count }} item{{ "s" if c.count != 1 else "" }}</b> · about <b>{{ c.paper_mins }} min</b> to read here · <b>{{ c.linked_mins | duration }}</b> behind the links</p>
+    <p class="total"><b>{{ c.count }} item{{ "s" if c.count != 1 else "" }}</b> · about <b>{{ c.paper_mins }} min</b> here{% if c.linked_mins %} · <b>{{ c.linked_mins | duration }}</b> if you open everything{% endif %}</p>
   </div>
   <div class="index-cols">
     {% for s, entries in c.sections %}
     <div class="index-sec">
       <h3>{{ s.title }}</h3>
-      <ol start="{{ entries[0].n if entries else 1 }}">
+      <ol start="{{ entries[0].n }}">
         {% for x in entries %}
-        <li><a href="#{{ x.anchor }}"><span class="n">{{ x.n }}</span> <span class="t">{{ x.item.title }}</span> <span class="m">{{ x.mins }} min</span></a></li>
+        <li><a href="#{{ x.anchor }}"><span class="n">{{ x.n }}</span> <span class="t">{{ x.item.title }}</span>{% if x.mins %} <span class="m">{{ x.mins }} min</span>{% endif %}</a></li>
         {% endfor %}
       </ol>
     </div>
     {% endfor %}
   </div>
 </nav>
+{% endif %}
 {% for s, entries in c.sections %}
-{% set rest = entries[1:] if loop.first else entries %}
+{% set rest = entries | rejectattr("n", "equalto", lead.n) | list %}
 {% if rest %}
 <section aria-labelledby="s-{{ s.id }}">
   <header class="opener">
@@ -97,7 +99,7 @@
 </div>
 <nav class="pager" aria-label="Editions">
   {% if prev %}<a href="{{ edition_path(prev) }}" rel="prev">Previous · No. {{ prev.number }}</a>{% endif %}
-  <a href="#index">Index</a>
+  {% if lead %}<a href="#index">Index</a>{% endif %}
   <a href="/archive/">All editions</a>
   {% if next %}<a href="{{ edition_path(next) }}" rel="next">Next · No. {{ next.number }}</a>{% endif %}
 </nav>

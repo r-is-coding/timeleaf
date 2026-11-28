@@ -121,26 +121,112 @@ def test_contents_numbers_items_across_the_edition(edition1: Edition) -> None:
     assert [x.item for x in c.entries] == edition1.items
 
 
-def test_contents_reading_times(edition1: Edition) -> None:
+def _three_items(edition1: Edition) -> Edition:
+    """One section, three linked items of 10 minutes each."""
+    e = edition1.model_copy(deep=True)
+    e.sections = e.sections[:1]
+    e.sections[0].items = e.sections[0].items[:3]
+    for i in e.sections[0].items:
+        i.mins = 10
+        assert i.url
+    return e
+
+
+def _render(tmp_path: Path, site: SiteConfig, e: Edition) -> str:
+    (tmp_path / "ed").mkdir()
+    (tmp_path / "ed/2026-11-27.json").write_text(e.model_dump_json(), encoding="utf-8")
+    build(tmp_path / "ed", tmp_path / "out", site)
+    return (tmp_path / "out/index.html").read_text(encoding="utf-8")
+
+
+def test_reading_time_is_the_items_own_never_estimated(edition1: Edition) -> None:
     c = contents(edition1)
-    for x in c.entries:
-        if x.item.mins:
-            assert x.mins == x.item.mins
-        else:  # estimated from the body at 230 words a minute, never zero
-            assert x.mins == max(1, -(-len(x.item.body.split()) // 230))
-    assert c.linked_mins == sum(x.mins for x in c.entries)
-    assert 1 <= c.paper_mins < c.linked_mins
-    long = edition1.model_copy(deep=True)
-    long.sections[0].items[0].mins = None
-    long.sections[0].items[0].body = "word " * 700
-    assert contents(long).entries[0].mins == 4
-    assert contents(long).paper_mins > c.paper_mins
+    assert [x.mins for x in c.entries] == [i.mins for i in edition1.items]
+    assert c.linked_mins == sum(i.mins for i in edition1.items if i.url and i.mins)
+    assert c.paper_mins >= 1
+
+
+def test_item_without_mins_has_no_time(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = _three_items(edition1)
+    e.sections[0].items[1].mins = None
+    e.sections[0].items[1].body = "word " * 700  # a long summary of ours is not the piece's reading time
+    c = contents(e)
+    assert c.entries[1].mins is None
+    assert c.linked_mins == 20
+    html = _render(tmp_path, site, e)
+    assert html.count('<span class="m">') == 2
+    assert "<b>20 min</b> if you open everything" in html
+
+
+def test_item_without_url_is_not_behind_a_link(edition1: Edition) -> None:
+    e = _three_items(edition1)
+    e.sections[0].items[2].url = None
+    c = contents(e)
+    assert c.entries[2].mins == 10
+    assert c.linked_mins == 20
+
+
+def test_zero_minutes_is_shown_nowhere(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = _three_items(edition1)
+    for i in e.sections[0].items:
+        i.mins = 0
+    c = contents(e)
+    assert [x.mins for x in c.entries] == [0, 0, 0] and c.linked_mins == 0
+    html = _render(tmp_path, site, e)
+    assert "0 min" not in html and "if you open everything" not in html
+    assert "<b>3 items</b>" in html
 
 
 def test_duration_filter() -> None:
+    assert _duration(0) == "0 min"
     assert _duration(40) == "40 min"
+    assert _duration(59) == "59 min"
     assert _duration(60) == "1 h"
+    assert _duration(62) == "1 h"
+    assert _duration(63) == "1 h 5 min"
     assert _duration(223) == "3 h 45 min"
+
+
+def _ids(html: str) -> list[str]:
+    return re.findall(r'\sid="([^"]+)"', html)
+
+
+def test_empty_first_section_is_skipped(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = edition1.model_copy(deep=True)
+    e.sections[0].items = []
+    c = contents(e)
+    assert c.lead_section is not None and c.lead_section.id == e.sections[1].id
+    assert c.lead is not None and c.lead.n == 1 and c.lead.item == e.sections[1].items[0]
+    assert e.sections[0].id not in [s.id for s, _ in c.sections]
+    html = _render(tmp_path, site, e)
+    ids = _ids(html)
+    assert len(ids) == len(set(ids)) and ids.count("item-1") == 1
+    assert f'id="s-{e.sections[0].id}"' not in html
+    assert sorted(i for i in ids if i.startswith("item-")) == sorted(x.anchor for x in c.entries)
+
+
+def test_empty_middle_section_is_skipped(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = edition1.model_copy(deep=True)
+    e.sections[2].items = []
+    c = contents(e)
+    assert [x.n for x in c.entries] == list(range(1, e.item_count + 1))
+    html = _render(tmp_path, site, e)
+    ids = _ids(html)
+    assert len(ids) == len(set(ids))
+    assert f'id="s-{e.sections[2].id}"' not in html and f">{e.sections[2].title}<" not in html
+    assert f'id="s-{e.sections[3].id}"' in html
+
+
+def test_edition_with_no_items_renders(tmp_path: Path, site: SiteConfig, edition1: Edition) -> None:
+    e = edition1.model_copy(deep=True)
+    for s in e.sections:
+        s.items = []
+    c = contents(e)
+    assert c.lead is None and c.lead_section is None and c.count == 0 and c.sections == []
+    html = _render(tmp_path, site, e)
+    assert html.count("<h1") == 1 and e.lede in html
+    assert 'class="index"' not in html and 'href="#index"' not in html and "<section" not in html
+    assert "That is all for this week." in html
 
 
 def test_edition_has_index_totals_and_orientation(built: Path, edition1: Edition) -> None:

@@ -65,21 +65,30 @@ class Entry:
     item: Item
     n: int  # 1-based position in the edition, for "4 of 17"
     anchor: str  # element id the front-page index jumps to
-    mins: int  # the item's own reading time, or an estimate from its body
+    mins: int | None  # reading time of the linked piece; None when unknown (never estimated)
 
 
 @dataclass(frozen=True)
 class Contents:
-    """What the front-page index needs: every section with its numbered items, and the totals."""
+    """What the front-page index needs: every non-empty section with its numbered items, and the totals."""
 
     sections: list[tuple[Section, list[Entry]]]
     count: int
     paper_mins: int  # reading the edition itself, top to bottom
-    linked_mins: int  # sum of the items' reading times: what is behind the links
+    linked_mins: int  # what is behind the links: items that have both a url and a reading time
 
     @property
     def entries(self) -> list[Entry]:
         return [x for _, xs in self.sections for x in xs]
+
+    @property
+    def lead(self) -> Entry | None:
+        """The first item of the edition, shown on the cover; None for an edition with no items."""
+        return self.sections[0][1][0] if self.sections else None
+
+    @property
+    def lead_section(self) -> Section | None:
+        return self.sections[0][0] if self.sections else None
 
 
 def _minutes(words: int) -> int:
@@ -95,14 +104,16 @@ def contents(e: Edition) -> Contents:
     n = 0
     words = _words(e.lede)
     for s in e.sections:
+        if not s.items:  # an empty section has no opener, no index entry and no number
+            continue
         entries = []
         words += _words(s.title, s.note)
         for i in s.items:
             n += 1
             words += _words(i.kicker, i.title, i.body, i.why)
-            entries.append(Entry(i, n, f"item-{n}", i.mins or _minutes(_words(i.body))))
+            entries.append(Entry(i, n, f"item-{n}", i.mins))
         sections.append((s, entries))
-    linked = sum(x.mins for _, xs in sections for x in xs)
+    linked = sum(x.mins for _, xs in sections for x in xs if x.item.url and x.mins)
     return Contents(sections, n, _minutes(words), linked)
 
 
