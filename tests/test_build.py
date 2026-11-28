@@ -259,3 +259,34 @@ def test_golden_edition_page(built: Path) -> None:
         GOLDEN.parent.mkdir(parents=True, exist_ok=True)
         GOLDEN.write_text(html, encoding="utf-8", newline="\n")
     assert html == GOLDEN.read_text(encoding="utf-8")
+
+
+def _luminance(colour: str) -> float:
+    parts = [int(colour[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+    r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in parts)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a: str, b: str) -> float:
+    hi, lo = sorted((_luminance(a), _luminance(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def palettes() -> list[dict[str, str]]:
+    """The day and night token sets, read from the stylesheet itself."""
+    css = (ROOT / "src/timeleaf/build/static/style.css").read_text(encoding="utf-8")
+    blocks = re.findall(r":root\{[^}]*\}", css)
+    found = [t for t in (dict(re.findall(r"--(\w+):(#[0-9a-f]{6})", b)) for b in blocks) if t]
+    assert len(found) == 2
+    return found
+
+
+def test_palette_meets_wcag_in_both_modes() -> None:
+    """docs/DESIGN.md: AA (4.5) for all text on both surfaces; AAA (7) for ink and muted text on paper."""
+    for t in palettes():
+        for surface in (t["paper"], t["wash"]):
+            for text in ("ink", "muted", "accent"):
+                assert contrast(t[text], surface) >= 4.5, (text, surface)
+        assert contrast(t["ink"], t["paper"]) >= 7
+        assert contrast(t["muted"], t["paper"]) >= 7
+        assert contrast(t["paper"], t["ink"]) >= 7  # buttons and the skip link: paper on ink
