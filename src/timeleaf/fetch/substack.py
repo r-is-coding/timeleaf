@@ -6,6 +6,7 @@ import datetime as dt
 import html
 import re
 from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from timeleaf.fetch.http import Http
 from timeleaf.models import Post
@@ -15,9 +16,27 @@ API = "https://substack.com/api/v1"
 _TAG = re.compile(r"<[^>]+>")
 _SPACE = re.compile(r"\s+")
 _HEADING = re.compile(r"<h[1-4][^>]*>(.*?)</h[1-4]>", re.S)
-_HREF = re.compile(r'href="(https?://[^"#?]+)')
-_SKIP_LINK = re.compile(r"substackcdn|/subscribe|twitter\.com/intent|\.(png|jpe?g|gif|webp)$", re.I)
-_ANCHOR = re.compile(r"<a\b([^>]*)>(.*?)</a>", re.S | re.I)
+# A real href attribute (not data-href), up to the closing quote or a fragment. The query is kept:
+# for links such as youtube.com/watch?v=… it is the address, and the editor copies URLs exactly.
+_HREF = re.compile(r'(?<![\w-])href="(https?://[^"#]+)', re.I)
+_SKIP_LINK = re.compile(r"substackcdn|/subscribe|twitter\.com/intent|\.(png|jpe?g|gif|webp)(\?|$)", re.I)
+# Anchor text may not contain another <a>, so an unclosed anchor cannot swallow the next one.
+_ANCHOR = re.compile(r"<a\b([^>]*)>((?:(?!<a\b).)*?)</a>", re.S | re.I)
+
+
+def _href(attrs: str) -> str | None:
+    m = _HREF.search(attrs)
+    if not m:
+        return None
+    parts = urlsplit(html.unescape(m.group(1)))
+    # Tracking parameters are noise; everything else in the query is part of the address.
+    query = urlencode(
+        [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True) if not k.startswith("utm_")]
+    )
+    url = urlunsplit((parts.scheme, parts.netloc, parts.path.rstrip("/"), query, ""))
+    return None if _SKIP_LINK.search(url) else url
+
+
 _OPEN_LINK = re.compile(r"\s*\[https?://[^\]]*$")
 ACTIVITY_TYPES = {"post_like", "post_restack", "restack", "note"}
 
@@ -35,10 +54,8 @@ def text_with_links(fragment: str | None, limit: int) -> str:
     """
 
     def keep(m: re.Match[str]) -> str:
-        href = _HREF.search(m.group(1))
-        if not href or _SKIP_LINK.search(href.group(1)):
-            return m.group(2)
-        return f"{m.group(2)} [{href.group(1).rstrip('/')}]"
+        url = _href(m.group(1))
+        return f"{m.group(2)} [{url}]" if url else m.group(2)
 
     out = text(_ANCHOR.sub(keep, fragment or ""), limit)
     # Never leave half a URL at the cut: the editor may only copy URLs, and a truncated one is wrong.
@@ -54,8 +71,9 @@ def headings(p: dict[str, Any]) -> list[str]:
 
 
 def links(p: dict[str, Any]) -> list[str]:
-    out = {u.rstrip("/") for u in _HREF.findall(p.get("body_html") or "") if not _SKIP_LINK.search(u)}
-    return sorted(out)
+    body = p.get("body_html") or ""
+    found = (_href(f'href="{u}"') for u in _HREF.findall(body))
+    return sorted({u for u in found if u})
 
 
 def slim(p: dict[str, Any], limit: int = 1500, *, inline_links: bool = False) -> Post:

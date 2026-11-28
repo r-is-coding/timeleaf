@@ -80,13 +80,27 @@ jobs:
       PAPER: ${{ matrix.reader.paper_name }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
+      # Always work from main, whichever branch the run was started from, so an edition can only
+      # ever add one file on top of reviewed code.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           token: ${{ secrets.EDITION_BOT_TOKEN || github.token }}
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
           enable-cache: true
       - run: uv sync --locked
+
+      # Value 12, private by default: a private paper's edition, candidates and logs must never land in
+      # a public repository. Auto mode therefore refuses to run until the repository is private.
+      - name: Refuse auto mode in a public repository
+        if: env.REVIEW == 'auto'
+        run: |
+          visibility=$(gh repo view "$GITHUB_REPOSITORY" --json visibility --jq .visibility)
+          if [ "$visibility" != "PRIVATE" ]; then
+            echo "::error::Reader $READER uses review: auto, but this repository is $visibility. Make it private first (docs/proposals/DECISIONS.md, note 1)."
+            exit 1
+          fi
 
       - name: Fetch candidates
         run: |
@@ -166,13 +180,18 @@ jobs:
           number=$(jq -r .number "$EDITION")
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$EDITION"
-          git commit -m "content($READER): edition $number ($DATE)"
+          cp "$EDITION" "$RUNNER_TEMP/edition.json"
           pushed=false
           for attempt in 1 2 3; do
+            # Commit only the edition file, on top of a fresh main; nothing else can ride along.
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+            mkdir -p "$(dirname "$EDITION")"
+            cp "$RUNNER_TEMP/edition.json" "$EDITION"
+            git add -- "$EDITION"
+            git commit --quiet -m "content($READER): edition $number ($DATE)"
             if git push origin HEAD:main; then pushed=true; break; fi
-            echo "push $attempt was rejected; rebasing on main"
-            git pull --rebase origin main
+            echo "push $attempt was rejected; retrying on a fresh main"
           done
           [ "$pushed" = true ]
           echo "Edition $number of reader \`$READER\` was committed to main." >> "$GITHUB_STEP_SUMMARY"

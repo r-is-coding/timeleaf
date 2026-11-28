@@ -75,10 +75,12 @@ def test_section_ids_and_empty_sections(edition1: Edition) -> None:
     assert {"section-id", "empty-section"} <= rules(e)
 
 
-def test_sections_are_checked_per_reader(edition1: Edition, richard: ReaderHome, juniper: ReaderHome) -> None:
+def test_sections_are_checked_per_reader(
+    edition1: Edition, candidates: Candidates, richard: ReaderHome, juniper: ReaderHome
+) -> None:
     # The Loop's own sections pass for its reader, and are unknown to another reader's paper.
-    assert "sections" not in rules(edition1, home=richard)
-    msgs = [f.message for f in validate(edition1, None, juniper.reader) if f.rule == "sections"]
+    assert "sections" not in rules(edition1, candidates, home=richard)
+    msgs = [f.message for f in validate(edition1, candidates, juniper.reader) if f.rule == "sections"]
     assert any("'front-page' is not one of The Kettle's sections" in m for m in msgs)
 
     def broken(change: str) -> list[str]:
@@ -90,7 +92,7 @@ def test_sections_are_checked_per_reader(edition1: Edition, richard: ReaderHome,
         elif change == "kind":
             e.sections[0].items[0].kind = "essay"
             e.sections[0].items[0].mins = 3
-        return [f.message for f in validate(e, None, richard.reader) if f.rule == "sections"]
+        return [f.message for f in validate(e, candidates, richard.reader) if f.rule == "sections"]
 
     assert "it must be 'Front page'" in broken("title")[0]
     assert "out of order" in broken("order")[0]
@@ -98,7 +100,15 @@ def test_sections_are_checked_per_reader(edition1: Edition, richard: ReaderHome,
     # leaving a section out is fine
     e = edition1.model_copy(deep=True)
     del e.sections[2]
-    assert "sections" not in rules(e, home=richard)
+    assert "sections" not in rules(e, candidates, home=richard)
+
+
+def test_renaming_a_section_never_fails_published_editions(edition1: Edition, richard: ReaderHome) -> None:
+    """A reader may rename, reorder or retype sections later; editions already published stay valid."""
+    reader = richard.reader.model_copy(deep=True)
+    reader.sections[0].title = "Top stories"
+    reader.sections.reverse()
+    assert "sections" not in {f.rule for f in validate(edition1, None, reader, richard.sources)}
 
 
 def test_buzz_rules(edition1: Edition) -> None:

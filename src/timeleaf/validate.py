@@ -116,7 +116,9 @@ def validate(
             err("empty-section", f"section {s.title!r} has no items")
 
     # US-12 "it feels like my paper": the sections are the ones this reader chose, in their order.
-    if reader is not None:
+    # Checked only when an edition is created (with candidates): a reader may rename or reorder
+    # sections later, and that must never fail editions that were already published.
+    if reader is not None and candidates is not None:
         order = [spec.id for spec in reader.sections]
         last = -1
         for s in edition.sections:

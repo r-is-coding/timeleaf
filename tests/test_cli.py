@@ -59,14 +59,15 @@ def test_validate_is_per_reader(two_readers: Path) -> None:
     # a file is checked against the reader whose folder it is in ...
     mine = two_readers / "richard/editions/2026-11-27.json"
     assert runner.invoke(app, ["validate", str(mine), *args]).exit_code == 0
-    # ... so The Loop's edition in The Kettle's folder fails on its sections
+    # ... and validating a published edition never re-judges its sections (that only happens when an
+    # edition is created, with candidates), so a later change to a reader's sections cannot break deploys
     (two_readers / "juniper/editions").mkdir()
     theirs = two_readers / "juniper/editions/2026-11-27.json"
     shutil.copy(mine, theirs)
     r = runner.invoke(app, ["validate", str(theirs), *args])
-    assert r.exit_code == 1 and "ERROR [sections]" in r.output
+    assert r.exit_code == 0 and "[sections]" not in r.output
     assert runner.invoke(app, ["validate", "--reader", "richard", *args]).exit_code == 0
-    assert runner.invoke(app, ["validate", "--reader", "juniper", *args]).exit_code == 1
+    assert runner.invoke(app, ["validate", "--reader", "juniper", *args]).exit_code == 0
     assert runner.invoke(app, ["validate", "--readers", str(two_readers / "nowhere")]).exit_code == 2
 
 

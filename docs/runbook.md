@@ -57,7 +57,7 @@ uv run timeleaf reader remove <id>          # deletes readers/<id>/
 
 **Removing a reader.**
 1. `uv run timeleaf reader remove <id>`, commit, merge. The folder, with every edition, is gone from the current files.
-2. The old commits still contain it. To erase it from history as well: `git filter-repo --path readers/<id> --invert-paths`, force-push, and ask GitHub Support to drop cached views of the old commits. Delete the reader's `candidates-<id>-*` and `preview-<id>-*` workflow artifacts (Actions → the run → Artifacts), or wait for them to expire (90 and 30 days).
+2. The old commits still contain it. To erase it from history as well: `git filter-repo --path readers/<id> --invert-paths`, force-push, and ask GitHub Support to drop cached views of the old commits. Delete the reader's `candidates-<id>-*` and `preview-<id>-*` workflow artifacts (Actions → the run → Artifacts), or wait for them to expire (90 and 30 days). Also delete their `edition/<id>-*` branches and any `edition-failed` issue comments that name them. Edition pull requests (`refs/pull/N/head` and their descriptions) can only be removed by GitHub Support; for private papers, which publish without pull requests, there are none.
 3. Once papers are behind a login: remove their address from the Cloudflare Access policy.
 4. Tell them it is done.
 

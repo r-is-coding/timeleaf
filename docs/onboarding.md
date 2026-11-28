@@ -8,13 +8,13 @@ To set it up, answer the questions below in your own words and send them back to
 
 Please read this first. If any of it is not fine with you, say so, or do not sign up.
 
-**Who can see your paper and your answers.** Two people: **you**, and **the owner of Timeleaf**, who runs the service and can read everything in it, including your answers below, your sources, your notes and every edition of your paper. Nobody else can, unless you choose to share it.
+**Who can see your paper and your answers.** **You**, and **the owner of Timeleaf**, who runs the service and can read everything in it: your answers below, your sources, your notes and every edition of your paper. Technically, anyone the owner gives access to the code repository could see it too (today that is nobody else), and so can the services in the table below, which store or process it. Nobody else sees it unless you share it.
 
 **Which services handle your data.**
 
 | Service | What it handles | Why |
 |---|---|---|
-| **GitHub** | Your answers, your sources, your notes and your editions, stored as files. It also runs the weekly job | Storage and automation |
+| **GitHub** | Your answers (including your login email), your sources, your notes and your editions, stored as files; the weekly job's logs and temporary files (kept up to 90 days) | Storage and automation |
 | **Anthropic** (the Claude API) | Each week: your description of yourself, your notes, and the week's candidate posts. Not your email address | An AI model drafts your paper |
 | **Cloudflare** (later, once papers are behind a login) | Your email address, to send you a one-time login code, and the pages of your paper | Hosting and login |
 

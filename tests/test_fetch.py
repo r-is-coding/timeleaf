@@ -11,7 +11,7 @@ from timeleaf.models import Candidates, Sources
 
 def test_text_with_links_keeps_each_link_next_to_its_words() -> None:
     body = (
-        '<p>See <a class="x" href="https://a.example/x/?utm=1#top"><em>the bill</em></a> and '
+        '<p>See <a class="x" href="https://a.example/x/?utm_source=1#top"><em>the bill</em></a> and '
         '<a href="https://substackcdn.com/i.png"><img src="i"></a>'
         '<a href="https://p.example/subscribe">subscribe</a> or <a href="mailto:a@b.example">write</a>.</p>'
     )
@@ -26,6 +26,33 @@ def test_text_with_links_never_cuts_a_url_in_half() -> None:
     body = 'Start <a href="https://a.example/long/path">here</a> end'
     assert text_with_links(body, 30) == "Start here"
     assert text_with_links(body, 200) == "Start here [https://a.example/long/path] end"
+
+
+def test_links_keep_real_queries_and_only_real_hrefs() -> None:
+    """A query can be the address (youtube.com/watch?v=...): keep it, so the editor copies a working URL."""
+    body = (
+        '<a data-href="https://wrong.example/x" href="https://www.youtube.com/watch?v=abc&amp;t=3&amp;utm_source=x">'
+        "the talk</a> "
+        '<a href="https://u.example/b">unclosed <a href="https://c.example/c">next</a> '
+        '<a href="https://substackcdn.com/i.png?w=600">img</a>'
+    )
+    out = text_with_links(body, 500)
+    assert "the talk [https://www.youtube.com/watch?v=abc&t=3]" in out
+    assert "next [https://c.example/c]" in out
+    assert "wrong.example" not in out and "substackcdn" not in out
+    assert links({"body_html": body}) == [
+        "https://c.example/c",
+        "https://u.example/b",
+        "https://www.youtube.com/watch?v=abc&t=3",
+    ]
+
+
+def test_text_with_links_is_fast_on_broken_html() -> None:
+    import time
+
+    start = time.perf_counter()
+    text_with_links('<p>x <a href="https://e.example/p">open ' * 4000, 20000)
+    assert time.perf_counter() - start < 2
 
 
 def test_archive_handles_both_response_shapes() -> None:
@@ -76,7 +103,7 @@ def test_links_skip_images_subscribe_and_dedupe() -> None:
     body = (
         '<a href="https://a.example/x/">1</a><a href="https://a.example/x">2</a>'
         '<a href="https://substackcdn.com/i.png">3</a><a href="https://p.example/subscribe">4</a>'
-        '<a href="https://a.example/y?utm=1">5</a>'
+        '<a href="https://a.example/y?utm_medium=email">5</a>'
     )
     assert links({"body_html": body}) == ["https://a.example/x", "https://a.example/y"]
 
